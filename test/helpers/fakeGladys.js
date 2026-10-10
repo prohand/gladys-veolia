@@ -14,6 +14,7 @@ export function createFakeGladys() {
     sceneEvents: [],
     connectionStatuses: [],
     widgetRefreshes: [],
+    transports: [],
     failStates: false,
 
     externalIds(type, platformId) {
@@ -43,6 +44,10 @@ export function createFakeGladys() {
 
     async setConnectionStatus(connected, message) {
       this.connectionStatuses.push({ connected, message });
+    },
+
+    async publishTransports(entries) {
+      this.transports.push(entries);
     },
 
     requestWidgetRefresh(key) {

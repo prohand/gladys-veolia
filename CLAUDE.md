@@ -79,6 +79,10 @@ connection lifecycle — and holds no Veolia logic.
   core matches trigger fields by equality, a `>` on an event value is a state's job.
 - **The widget computes its values** instead of binding tiles to device features: a live tile
   would show the publication time of a past state, and the device may not be added yet.
+- **Transport badge**: `transports: ["cloud"]` only — the readings only exist on the Veolia
+  cloud, a `local` value would be a lie and would add a useless "Prefer local" toggle.
+  `publishTransports` reports `cloud`, `unreachable` (Veolia error) or `cloud` + degraded (no
+  reading for `overdue_days`); a Gladys-side failure does not touch the badge.
 - **AWS WAF**: Cognito answers `403 Request not allowed due to WAF block` from some datacenter
   addresses (CI runners, cloud sandboxes). It is reported as a `VeoliaApiError` with that text,
   never as wrong credentials.

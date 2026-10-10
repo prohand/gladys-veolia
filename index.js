@@ -128,6 +128,7 @@ gladys.on('connected', async () => {
       // Gladys restarted: re-publish what we have, read Veolia on schedule.
       await gladys.publishDiscoveredDevices(sync.buildDevices());
       await sync.reportStatus(true);
+      await sync.publishTransports(true);
       refreshWidgets(gladys);
       return;
     }

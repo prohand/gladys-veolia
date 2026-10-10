@@ -20,6 +20,9 @@ All notable changes to this integration are documented here. The format follows
   configuration), water reading overdue.
 - Scene actions: refresh the water consumption, get the consumption of a period
   (last day, this month, last month, this year).
+- Cloud transport badge on the meter: `cloud` while the Veolia portal answers,
+  `unreachable` when it does not, and an orange dot when no new reading came
+  for the "missing reading" delay.
 - "Test the connection" and "Check my town" (postal code → Veolia portal)
   actions in the Configuration screen.
 - CI runs the tests on Node 22 and 24, and on pull requests builds the Docker

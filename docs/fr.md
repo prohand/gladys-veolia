@@ -45,6 +45,11 @@ précédent) est envoyé à Gladys, **à la date de chaque relevé**.
 | Consommation du mois     | m³    | Total du mois en cours                                   |
 | Consommation de l'année  | m³    | Total de l'année civile en cours                         |
 
+La carte de l'appareil porte le badge **Cloud** quand le portail
+Veolia répond, **Injoignable** quand il ne répond pas, avec un point orange
+quand aucun relevé n'est arrivé depuis le délai « Relevé manquant après ».
+Il n'y a pas de mode local : les données n'existent que chez Veolia.
+
 Bon à savoir : Veolia publie un relevé avec **1 à 3 jours de retard**. Il
 est normal de ne pas voir la consommation d'hier.
 

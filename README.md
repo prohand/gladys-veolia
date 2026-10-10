@@ -32,6 +32,10 @@ does.
   and year totals (m³).
 - **Daily readings are published as past states**, dated on the reading day:
   Veolia publishes them 1 to 3 days late.
+- **Transport badge** on the device card: `cloud` while the portal answers,
+  `unreachable` when it does not, orange dot (degraded) when no reading came
+  for `overdue_days`. No `local` channel: the data only exists on the Veolia
+  cloud, so the manifest declares `transports: ["cloud"]`.
 - Refresh every `refresh_hours` (default 6 h), 3 to 4 requests per refresh.
 - **Scene triggers**: `new_reading`, `high_consumption` (threshold in the
   configuration), `reading_overdue`.

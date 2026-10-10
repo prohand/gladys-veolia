@@ -45,6 +45,11 @@ month) is sent to Gladys, **dated on each reading day**.
 | Consommation du mois     | m³   | Total of the current month                      |
 | Consommation de l'année  | m³   | Total of the current calendar year              |
 
+The device card carries the **Cloud** badge while the Veolia portal answers,
+**Unreachable** when it does not, with an orange dot when no reading came for
+the "Missing reading after" delay. There is no local mode: the data only
+exists at Veolia.
+
 Good to know: Veolia publishes a reading **1 to 3 days late**. Not seeing
 yesterday's consumption is normal.
 

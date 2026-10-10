@@ -250,3 +250,36 @@ test('an account change during a refresh drops the old account data', async () =
   assert.equal((await next).ok, true, 'the new account is read right after');
   assert.equal(sync.meters.size, 1);
 });
+
+test('the transport badge follows the Veolia link and the reading delay', async () => {
+  const { gladys, sync, clock, portal } = setup({ daily: history(), config: { overdue_days: 3 } });
+  await sync.refresh();
+  assert.deepEqual(gladys.transports.at(-1), [{ external_id: DEVICE_ID, transport: 'cloud' }]);
+
+  setToday(clock, '2026-10-12');
+  await sync.refresh();
+  const [overdue] = gladys.transports.at(-1);
+  assert.equal(overdue.transport, 'cloud');
+  assert.equal(overdue.degraded, true);
+  assert.match(overdue.message.fr, /4 jours/);
+
+  portal.failures.push(
+    { match: /journalieres/, status: 503 },
+    { match: /journalieres/, status: 503 },
+    { match: /journalieres/, status: 503 },
+  );
+  await sync.refresh();
+  assert.deepEqual(gladys.transports.at(-1), [
+    { external_id: DEVICE_ID, transport: 'unreachable' },
+  ]);
+});
+
+test('a Gladys failure does not mark the meter unreachable', async () => {
+  const { gladys, sync } = setup({ daily: history() });
+  await sync.refresh();
+  gladys.createAllDevices();
+  const sent = gladys.transports.length;
+  gladys.failStates = true;
+  await sync.refresh();
+  assert.equal(gladys.transports.length, sent);
+});

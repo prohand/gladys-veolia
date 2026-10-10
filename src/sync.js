@@ -13,7 +13,7 @@
 // device creation never call Veolia themselves.
 // -----------------------------------------------------------------------------
 
-import { createLogger } from '@gladysassistant/integration-sdk';
+import { createLogger, DEVICE_TRANSPORTS } from '@gladysassistant/integration-sdk';
 import { VeoliaApiError, VeoliaAuthError, VeoliaClient } from './veolia/client.js';
 import {
   localDate,
@@ -174,6 +174,7 @@ export class VeoliaSync {
       this.lastSuccess = this.now();
       this.lastError = null;
       await this.reportStatus(true);
+      await this.publishTransports(true);
       return { ok: true };
     } catch (err) {
       let message;
@@ -190,6 +191,11 @@ export class VeoliaSync {
       logger.error(`Refresh failed: ${err.message}`);
       this.lastError = err;
       await this.reportStatus(false, message);
+      if (!(err instanceof VeoliaApiError || err instanceof VeoliaAuthError)) {
+        // Gladys refused a call: the Veolia link itself is fine.
+        return { ok: false, message };
+      }
+      await this.publishTransports(false);
       return { ok: false, message };
     } finally {
       this.onUpdate();
@@ -306,6 +312,46 @@ export class VeoliaSync {
     } catch (err) {
       // An event lost is not worth failing the refresh (Gladys < 5.1, 429...).
       logger.warn(`Scene event ${key} not sent: ${err.message}`);
+    }
+  }
+
+  /**
+   * The per-device transport badge. The data only comes from the Veolia cloud
+   * (manifest `transports: ["cloud"]`, no local channel): `cloud` while the
+   * portal answers, `unreachable` when it does not, and `cloud` + degraded when
+   * it answers but the meter has sent nothing for `overdue_days`.
+   */
+  buildTransports(reachable) {
+    return [...this.meters.values()].map((meter) => {
+      const external_id = meterIds(this.gladys, meter.subscription.pds).device;
+      if (!reachable) {
+        return { external_id, transport: DEVICE_TRANSPORTS.UNREACHABLE };
+      }
+      const days = meter.summary.daysSinceReading;
+      if (days !== null && days >= this.config.overdue_days) {
+        return {
+          external_id,
+          transport: DEVICE_TRANSPORTS.CLOUD,
+          degraded: true,
+          message: {
+            en: `Veolia answers, but no new reading for ${days} days.`,
+            fr: `Veolia répond, mais aucun nouveau relevé depuis ${days} jours.`,
+          },
+        };
+      }
+      return { external_id, transport: DEVICE_TRANSPORTS.CLOUD };
+    });
+  }
+
+  async publishTransports(reachable = this.status.connected) {
+    const entries = this.buildTransports(reachable);
+    if (entries.length === 0) {
+      return;
+    }
+    try {
+      await this.gladys.publishTransports(entries);
+    } catch (err) {
+      logger.warn(`Transport badge not sent: ${err.message}`);
     }
   }
 
