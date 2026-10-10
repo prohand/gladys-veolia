@@ -6,6 +6,8 @@ All notable changes to this integration are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-10
+
 ### Added
 
 - First version: reads the water consumption of a Veolia customer account
@@ -29,4 +31,5 @@ All notable changes to this integration are documented here. The format follows
   image and runs the store admission checks; Dependabot keeps the npm
   dependencies, the GitHub Actions and the Docker base image up to date.
 
-[Unreleased]: https://github.com/prohand/gladys-veolia/commits/main
+[Unreleased]: https://github.com/prohand/gladys-veolia/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/prohand/gladys-veolia/releases/tag/v1.0.1
