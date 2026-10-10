@@ -1,0 +1,522 @@
+{
+  "manifest_version": 1,
+  "type": "device",
+  "name": "Veolia",
+  "description": {
+    "en": "Your water consumption from your Veolia customer account (eau.veolia.fr).",
+    "fr": "Votre consommation d'eau depuis votre espace client Veolia (eau.veolia.fr)."
+  },
+  "version": "1.0.0",
+  "docker_image": "ghcr.io/prohand/gladys-veolia:1.0.0",
+  "gladys_version": ">=5.1.0",
+  "cover_image": "https://raw.githubusercontent.com/prohand/gladys-veolia/main/cover.png",
+  "categories": ["energy", "environment"],
+  "transports": ["cloud"],
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": {
+        "en": "Getting started",
+        "fr": "Pour commencer"
+      },
+      "description": {
+        "en": "Your home needs a remote-read water meter (télérelève) and a Veolia customer account. Enter the e-mail and password you use on the Veolia website. Not sure your town is served by Veolia? Use the \"Check my town\" button below.",
+        "fr": "Votre logement doit avoir un compteur d'eau télérelevé et un espace client Veolia. Indiquez l'e-mail et le mot de passe utilisés sur le site Veolia. Un doute sur votre commune ? Utilisez le bouton « Vérifier ma commune » ci-dessous."
+      },
+      "links": [
+        {
+          "url": "https://github.com/prohand/gladys-veolia/blob/main/docs/fr.md",
+          "label": {
+            "en": "Step-by-step guide",
+            "fr": "Guide pas à pas"
+          }
+        },
+        {
+          "url": "https://www.eau.veolia.fr",
+          "label": {
+            "en": "Veolia customer portal",
+            "fr": "Espace client Veolia"
+          }
+        }
+      ]
+    },
+    {
+      "key": "email",
+      "type": "string",
+      "label": {
+        "en": "Veolia e-mail",
+        "fr": "E-mail Veolia"
+      },
+      "description": {
+        "en": "The e-mail address of your Veolia customer account.",
+        "fr": "L'adresse e-mail de votre espace client Veolia."
+      },
+      "placeholder": {
+        "en": "e.g. me@example.com",
+        "fr": "ex. moi@exemple.fr"
+      },
+      "required": true
+    },
+    {
+      "key": "password",
+      "type": "secret",
+      "label": {
+        "en": "Veolia password",
+        "fr": "Mot de passe Veolia"
+      },
+      "required": true
+    },
+    {
+      "key": "portal",
+      "type": "select",
+      "label": {
+        "en": "Customer portal",
+        "fr": "Espace client"
+      },
+      "description": {
+        "en": "Keep eau.veolia.fr unless your town redirects you to its own Veolia portal.",
+        "fr": "Gardez eau.veolia.fr sauf si votre commune vous redirige vers son propre portail Veolia."
+      },
+      "required": false,
+      "default": "eau.veolia.fr",
+      "options": [
+        {
+          "value": "eau.veolia.fr",
+          "label": {
+            "en": "Veolia (eau.veolia.fr)",
+            "fr": "Veolia (eau.veolia.fr)"
+          }
+        },
+        {
+          "value": "eaudetm.monespace.eau.veolia.fr",
+          "label": {
+            "en": "Eau de Toulouse Métropole",
+            "fr": "Eau de Toulouse Métropole"
+          }
+        }
+      ]
+    },
+    {
+      "key": "refresh_hours",
+      "type": "number",
+      "label": {
+        "en": "Refresh interval (h)",
+        "fr": "Intervalle de rafraîchissement (h)"
+      },
+      "description": {
+        "en": "How often the Veolia portal is read, in hours. Veolia publishes one reading a day.",
+        "fr": "Fréquence de lecture du portail Veolia, en heures. Veolia publie un relevé par jour."
+      },
+      "required": false,
+      "default": 6,
+      "min": 1,
+      "max": 24
+    },
+    {
+      "key": "high_consumption_liters",
+      "type": "number",
+      "label": {
+        "en": "High consumption threshold (L/day)",
+        "fr": "Seuil de forte consommation (L/jour)"
+      },
+      "description": {
+        "en": "A day at or above this many litres fires the \"High consumption\" scene trigger. 0 turns it off.",
+        "fr": "Une journée à ce nombre de litres ou plus lance le déclencheur de scène « Forte consommation ». 0 le désactive."
+      },
+      "placeholder": {
+        "en": "e.g. 500",
+        "fr": "ex. 500"
+      },
+      "required": false,
+      "default": 0,
+      "min": 0,
+      "max": 100000
+    },
+    {
+      "key": "overdue_days",
+      "type": "number",
+      "label": {
+        "en": "Missing reading after (days)",
+        "fr": "Relevé manquant après (jours)"
+      },
+      "description": {
+        "en": "Days without a new reading before the \"Reading overdue\" scene trigger fires.",
+        "fr": "Nombre de jours sans nouveau relevé avant le déclencheur de scène « Relevé en retard »."
+      },
+      "required": false,
+      "default": 3,
+      "min": 1,
+      "max": 30
+    }
+  ],
+  "actions": [
+    {
+      "key": "test_connection",
+      "label": {
+        "en": "Test the connection",
+        "fr": "Tester la connexion"
+      },
+      "timeout_seconds": 90
+    },
+    {
+      "key": "check_town",
+      "label": {
+        "en": "Check my town",
+        "fr": "Vérifier ma commune"
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "postal_code",
+          "type": "string",
+          "label": {
+            "en": "Postal code",
+            "fr": "Code postal"
+          },
+          "placeholder": {
+            "en": "e.g. 57000",
+            "fr": "ex. 57000"
+          },
+          "required": true
+        }
+      ]
+    }
+  ],
+  "scene_triggers": [
+    {
+      "key": "new_reading",
+      "label": {
+        "en": "New water reading",
+        "fr": "Nouveau relevé d'eau"
+      },
+      "description": {
+        "en": "Veolia published the consumption of a new day.",
+        "fr": "Veolia a publié la consommation d'une nouvelle journée."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Meter",
+            "fr": "Compteur"
+          }
+        }
+      ],
+      "variables": [
+        {
+          "key": "date",
+          "type": "string",
+          "label": {
+            "en": "Reading date",
+            "fr": "Date du relevé"
+          }
+        },
+        {
+          "key": "liters",
+          "type": "number",
+          "label": {
+            "en": "Litres used that day",
+            "fr": "Litres consommés ce jour-là"
+          }
+        },
+        {
+          "key": "index_m3",
+          "type": "number",
+          "label": {
+            "en": "Meter index (m³)",
+            "fr": "Index du compteur (m³)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "high_consumption",
+      "label": {
+        "en": "High water consumption",
+        "fr": "Forte consommation d'eau"
+      },
+      "description": {
+        "en": "A day reached the threshold set in the configuration (possible leak).",
+        "fr": "Une journée a atteint le seuil réglé dans la configuration (fuite possible)."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Meter",
+            "fr": "Compteur"
+          }
+        }
+      ],
+      "variables": [
+        {
+          "key": "date",
+          "type": "string",
+          "label": {
+            "en": "Day",
+            "fr": "Jour"
+          }
+        },
+        {
+          "key": "liters",
+          "type": "number",
+          "label": {
+            "en": "Litres used that day",
+            "fr": "Litres consommés ce jour-là"
+          }
+        },
+        {
+          "key": "threshold_liters",
+          "type": "number",
+          "label": {
+            "en": "Threshold (L)",
+            "fr": "Seuil (L)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "reading_overdue",
+      "label": {
+        "en": "Water reading overdue",
+        "fr": "Relevé d'eau en retard"
+      },
+      "description": {
+        "en": "No new reading for the number of days set in the configuration.",
+        "fr": "Aucun nouveau relevé depuis le nombre de jours réglé dans la configuration."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Meter",
+            "fr": "Compteur"
+          }
+        }
+      ],
+      "variables": [
+        {
+          "key": "last_date",
+          "type": "string",
+          "label": {
+            "en": "Last reading date",
+            "fr": "Date du dernier relevé"
+          }
+        },
+        {
+          "key": "days",
+          "type": "number",
+          "label": {
+            "en": "Days without reading",
+            "fr": "Jours sans relevé"
+          }
+        }
+      ]
+    }
+  ],
+  "scene_actions": [
+    {
+      "key": "refresh_consumption",
+      "label": {
+        "en": "Refresh the water consumption",
+        "fr": "Rafraîchir la consommation d'eau"
+      },
+      "description": {
+        "en": "Read the Veolia portal now and return the latest reading.",
+        "fr": "Lit le portail Veolia maintenant et renvoie le dernier relevé."
+      },
+      "timeout_seconds": 90,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Meter",
+            "fr": "Compteur"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "key": "date",
+          "type": "string",
+          "label": {
+            "en": "Reading date",
+            "fr": "Date du relevé"
+          }
+        },
+        {
+          "key": "liters",
+          "type": "number",
+          "label": {
+            "en": "Litres used that day",
+            "fr": "Litres consommés ce jour-là"
+          }
+        },
+        {
+          "key": "index_m3",
+          "type": "number",
+          "label": {
+            "en": "Meter index (m³)",
+            "fr": "Index du compteur (m³)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "get_consumption",
+      "label": {
+        "en": "Get the water consumption",
+        "fr": "Obtenir la consommation d'eau"
+      },
+      "description": {
+        "en": "The consumption of a period, for the next actions (message, condition...).",
+        "fr": "La consommation d'une période, pour les actions suivantes (message, condition…)."
+      },
+      "timeout_seconds": 90,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Meter",
+            "fr": "Compteur"
+          }
+        },
+        {
+          "key": "period",
+          "type": "select",
+          "label": {
+            "en": "Period",
+            "fr": "Période"
+          },
+          "required": true,
+          "default": "last_day",
+          "options": [
+            {
+              "value": "last_day",
+              "label": {
+                "en": "Last reading day",
+                "fr": "Dernier jour relevé"
+              }
+            },
+            {
+              "value": "current_month",
+              "label": {
+                "en": "This month",
+                "fr": "Ce mois-ci"
+              }
+            },
+            {
+              "value": "previous_month",
+              "label": {
+                "en": "Last month",
+                "fr": "Le mois dernier"
+              }
+            },
+            {
+              "value": "current_year",
+              "label": {
+                "en": "This year",
+                "fr": "Cette année"
+              }
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "key": "liters",
+          "type": "number",
+          "label": {
+            "en": "Litres",
+            "fr": "Litres"
+          }
+        },
+        {
+          "key": "cubic_meters",
+          "type": "number",
+          "label": {
+            "en": "Cubic metres",
+            "fr": "Mètres cubes"
+          }
+        },
+        {
+          "key": "date",
+          "type": "string",
+          "label": {
+            "en": "Day, month or year",
+            "fr": "Jour, mois ou année"
+          }
+        }
+      ]
+    }
+  ],
+  "widgets": [
+    {
+      "key": "water_consumption",
+      "label": {
+        "en": "Water consumption",
+        "fr": "Consommation d'eau"
+      },
+      "description": {
+        "en": "Last day, month, year and index, with a daily chart.",
+        "fr": "Dernier jour, mois, année et index, avec un graphique par jour."
+      },
+      "icon": "droplet",
+      "action_timeout_seconds": 90,
+      "settings": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Meter",
+            "fr": "Compteur"
+          }
+        },
+        {
+          "key": "days",
+          "type": "select",
+          "label": {
+            "en": "Chart period",
+            "fr": "Période du graphique"
+          },
+          "default": "14",
+          "options": [
+            {
+              "value": "7",
+              "label": {
+                "en": "7 days",
+                "fr": "7 jours"
+              }
+            },
+            {
+              "value": "14",
+              "label": {
+                "en": "14 days",
+                "fr": "14 jours"
+              }
+            },
+            {
+              "value": "30",
+              "label": {
+                "en": "30 days",
+                "fr": "30 jours"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
