@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { Store } from '../src/store.js';
-import { TRIGGERS } from '../src/sync.js';
+import { HISTORY_MONTHS, TRIGGERS } from '../src/sync.js';
 import { FEATURE } from '../src/meter.js';
 import { MESSAGES } from '../src/status.js';
 import { normalizeConfig } from '../src/config.js';
@@ -282,4 +282,94 @@ test('a Gladys failure does not mark the meter unreachable', async () => {
   gladys.failStates = true;
   await sync.refresh();
   assert.equal(gladys.transports.length, sent);
+});
+
+// Two and a half years of readings: more than the import goes back.
+const longHistory = () => dailyRange('2024-04-01', '2026-10-08');
+const dailyDates = (gladys) =>
+  gladys.published
+    .filter((s) => s.device_feature_external_id === dailyFeature)
+    .map((s) => s.created_at.slice(0, 10));
+
+test('the history import waits for the device to be added', async () => {
+  const { gladys, sync, store } = setup({ daily: longHistory() });
+  await sync.refresh();
+  await sync.importHistory();
+  assert.equal(gladys.published.length, 0);
+  assert.equal(store.get(ACCOUNT.pds, 'history'), null);
+});
+
+test('adding the device imports HISTORY_MONTHS older months, paced', async () => {
+  const pauses = [];
+  const { gladys, sync, store } = setup({
+    daily: longHistory(),
+    sleep: async (ms) => pauses.push(ms),
+  });
+  await sync.refresh();
+  gladys.createAllDevices();
+  await sync.onDeviceCreated(DEVICE_ID);
+  await sync.importHistory();
+
+  const dates = dailyDates(gladys);
+  assert.equal(dates.length, new Set(dates).size, 'each day published once');
+  // September and October 2026 by the device creation, then the
+  // HISTORY_MONTHS months before them: August 2026 back to September 2024.
+  assert.equal(HISTORY_MONTHS, 24);
+  assert.equal(dates.sort()[0], '2024-09-01');
+  assert.ok(dates.includes('2026-08-31'));
+  assert.equal(pauses.length, HISTORY_MONTHS - 1, 'one pause between two months');
+  assert.ok(pauses.every((ms) => ms >= 10_000));
+  assert.ok(gladys.stateCalls.every((batch) => batch.length <= 100));
+  assert.equal(store.get(ACCOUNT.pds, 'history'), 'done');
+
+  gladys.stateCalls.length = 0;
+  await sync.refresh();
+  await sync.importHistory();
+  assert.equal(gladys.published.filter((s) => s.created_at).length, 0, 'done is done');
+});
+
+test('the history import goes back HISTORY_MONTHS, no further', async () => {
+  const { gladys, sync, portal } = setup({ daily: longHistory() });
+  await sync.refresh();
+  gladys.createAllDevices();
+  await sync.onDeviceCreated(DEVICE_ID);
+  await sync.importHistory();
+  // The subscription started in 2020: the cap applies, not the start date.
+  const months = portal.calls
+    .filter((c) => c.url.pathname.endsWith('/journalieres'))
+    .map((c) => `${c.url.searchParams.get('annee')}-${c.url.searchParams.get('mois')}`);
+  assert.ok(months.includes('2024-9') && !months.includes('2024-8'));
+});
+
+test('an interrupted history import resumes where it stopped', async () => {
+  const { gladys, sync, portal, store } = setup({ daily: longHistory() });
+  await sync.refresh();
+  gladys.createAllDevices();
+  // Three retries on 5xx: fail the 2026-05 month for good this time.
+  for (let i = 0; i < 3; i += 1) {
+    portal.failures.push({ match: /journalieres.*annee=2026&mois=5/, status: 503 });
+  }
+  await sync.onDeviceCreated(DEVICE_ID);
+  await sync.importHistory();
+  assert.equal(store.get(ACCOUNT.pds, 'history'), '2026-06');
+
+  await sync.refresh();
+  await sync.importHistory();
+  assert.equal(store.get(ACCOUNT.pds, 'history'), 'done');
+  const dates = dailyDates(gladys);
+  assert.equal(dates.length, new Set(dates).size, 'nothing published twice');
+  assert.ok(dates.includes('2026-05-15') && dates.includes('2024-09-01'));
+});
+
+test('the refresh and the history import never sign in twice in parallel', async () => {
+  const { gladys, sync, portal, clock } = setup({ daily: longHistory() });
+  await sync.refresh();
+  gladys.createAllDevices();
+  await sync.onDeviceCreated(DEVICE_ID);
+  // The token expires while the import runs: both need a new one.
+  setToday(clock, '2026-10-11');
+  const result = await sync.refresh();
+  await sync.importHistory();
+  assert.deepEqual(result, { ok: true });
+  assert.equal(portal.logins, 2);
 });

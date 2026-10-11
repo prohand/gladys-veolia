@@ -92,13 +92,12 @@ export function buildDevice(gladys, subscription) {
 const pastInstant = (date) => `${date}T12:00:00.000Z`;
 
 /**
- * The states to publish for a meter.
+ * The past states of daily readings (consumption and index, on the reading day).
  * @param {object} gladys
  * @param {string} pds
- * @param {Array} readings daily readings newer than the last published one
- * @param {object} summary see summarize()
+ * @param {Array} readings normalized daily readings
  */
-export function buildStates(gladys, pds, readings, summary) {
+export function buildReadingStates(gladys, pds, readings) {
   const ids = meterIds(gladys, pds);
   const states = [];
   for (const reading of readings) {
@@ -115,6 +114,19 @@ export function buildStates(gladys, pds, readings, summary) {
       });
     }
   }
+  return states;
+}
+
+/**
+ * The states to publish for a meter.
+ * @param {object} gladys
+ * @param {string} pds
+ * @param {Array} readings daily readings newer than the last published one
+ * @param {object} summary see summarize()
+ */
+export function buildStates(gladys, pds, readings, summary) {
+  const ids = meterIds(gladys, pds);
+  const states = buildReadingStates(gladys, pds, readings);
   // Running totals: their value is "as of now".
   states.push(
     { device_feature_external_id: ids.feature(FEATURE.MONTH), state: summary.currentMonthM3 },

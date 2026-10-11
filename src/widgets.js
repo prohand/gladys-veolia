@@ -9,12 +9,13 @@
 // -----------------------------------------------------------------------------
 
 import { createLogger, WIDGET_COLORS } from '@gladysassistant/integration-sdk';
-import { reliabilityOf } from './veolia/consumption.js';
+import { reliabilityOf, yearlyComparison } from './veolia/consumption.js';
 import { MESSAGES } from './status.js';
 
 const logger = createLogger({ name: 'widgets' });
 
 export const WATER_WIDGET = 'water_consumption';
+export const COMPARISON_WIDGET = 'water_comparison';
 
 const WIDGET_ACTIONS = { REFRESH: 'refresh' };
 
@@ -152,31 +153,120 @@ export function buildWidgetContent(sync, settings = {}) {
   return { ttl_seconds: 3600, components };
 }
 
+/** Percentage change, as a tile string ('+12 %', '−5 %'). */
+function change(now, before) {
+  const percent = Math.round(((now - before) / before) * 100);
+  return `${percent > 0 ? '+' : percent < 0 ? '−' : ''}${Math.abs(percent)} %`;
+}
+
+export function buildComparisonContent(sync, settings = {}) {
+  const meter = sync.meterOf(settings.device);
+  if (!meter) {
+    return emptyContent(sync);
+  }
+  const today = sync.today();
+  const thisYear = Number(today.slice(0, 4));
+  const years = yearlyComparison({ daily: meter.daily, monthly: meter.monthly, today });
+  const current = years.at(-1);
+  const components = [
+    {
+      type: 'text',
+      variant: 'caption',
+      text: {
+        en: `Meter ${meter.subscription.meter}, per month`,
+        fr: `Compteur ${meter.subscription.meter}, par mois`,
+      },
+    },
+  ];
+  for (const entry of years) {
+    const inProgress = entry.year === thisYear;
+    components.push({
+      type: 'value',
+      label: inProgress
+        ? { en: `${entry.year} so far`, fr: `${entry.year} à ce jour` }
+        : String(entry.year),
+      icon: 'calendar',
+      value: m3(entry.total),
+      unit: 'm³',
+      color: inProgress ? WIDGET_COLORS.PRIMARY : WIDGET_COLORS.NEUTRAL,
+    });
+  }
+  const before = years.at(-2);
+  if (current?.year === thisYear && current.samePeriod !== null && before?.samePeriod) {
+    // Same months on both sides: January to the last full month.
+    components.push({
+      type: 'value',
+      label: { en: `vs ${before.year}`, fr: `vs ${before.year}` },
+      icon: 'trending-up',
+      value: change(current.samePeriod, before.samePeriod),
+      color: current.samePeriod > before.samePeriod ? WIDGET_COLORS.WARNING : WIDGET_COLORS.SUCCESS,
+    });
+  }
+  // Every year is drawn on the months of the current one, so the bars of the
+  // same month stand side by side; the series name tells the year.
+  const series = years
+    .map((entry) => ({
+      name: String(entry.year),
+      points: entry.months.flatMap((value, i) =>
+        value === null ? [] : [{ t: `${thisYear}-${String(i + 1).padStart(2, '0')}-01`, v: value }],
+      ),
+    }))
+    .filter((serie) => serie.points.length > 0);
+  if (series.length > 0) {
+    components.push({
+      type: 'chart',
+      chart_type: 'bar',
+      title: { en: 'Monthly consumption', fr: 'Consommation par mois' },
+      unit: 'm³',
+      series,
+    });
+  } else {
+    components.push({
+      type: 'text',
+      text: {
+        en: 'Veolia has no monthly total for this meter yet.',
+        fr: 'Veolia n’a pas encore de total mensuel pour ce compteur.',
+      },
+    });
+  }
+  components.push(refreshButton());
+  return { ttl_seconds: 3600, components };
+}
+
+// The button carries no params: nothing from the dashboard reaches Veolia.
+async function refreshAction(key, sync, { actionKey }) {
+  logger.info(`onWidgetAction <- ${key}.${actionKey}`);
+  if (actionKey !== WIDGET_ACTIONS.REFRESH) {
+    throw new Error(`Unknown widget action: ${actionKey}`);
+  }
+  const result = await sync.refresh();
+  if (result.ok) {
+    return { en: 'Consumption refreshed.', fr: 'Consommation rafraîchie.' };
+  }
+  // Toasts are capped at 200 characters: the detail is in the status.
+  return result.message === MESSAGES.notConfigured
+    ? MESSAGES.notConfigured
+    : {
+        en: 'Refresh failed: see the integration status.',
+        fr: 'Échec du rafraîchissement : voir le statut de l’intégration.',
+      };
+}
+
 export const WIDGETS = {
   [WATER_WIDGET]: {
     async get(sync, { settings }) {
       logger.debug(`onWidgetGet <- ${WATER_WIDGET}`);
       return buildWidgetContent(sync, settings);
     },
+    action: (sync, request) => refreshAction(WATER_WIDGET, sync, request),
+  },
 
-    // The button carries no params: nothing from the dashboard reaches Veolia.
-    async action(sync, { actionKey }) {
-      logger.info(`onWidgetAction <- ${WATER_WIDGET}.${actionKey}`);
-      if (actionKey !== WIDGET_ACTIONS.REFRESH) {
-        throw new Error(`Unknown widget action: ${actionKey}`);
-      }
-      const result = await sync.refresh();
-      if (result.ok) {
-        return { en: 'Consumption refreshed.', fr: 'Consommation rafraîchie.' };
-      }
-      // Toasts are capped at 200 characters: the detail is in the status.
-      return result.message === MESSAGES.notConfigured
-        ? MESSAGES.notConfigured
-        : {
-            en: 'Refresh failed: see the integration status.',
-            fr: 'Échec du rafraîchissement : voir le statut de l’intégration.',
-          };
+  [COMPARISON_WIDGET]: {
+    async get(sync, { settings }) {
+      logger.debug(`onWidgetGet <- ${COMPARISON_WIDGET}`);
+      return buildComparisonContent(sync, settings);
     },
+    action: (sync, request) => refreshAction(COMPARISON_WIDGET, sync, request),
   },
 };
 

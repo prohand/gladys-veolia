@@ -7,7 +7,9 @@
 //   - event: date of the last reading the scene triggers have seen, so a
 //     restart does not fire `new_reading` again;
 //   - overdue: date of the last reading an `reading_overdue` event was fired
-//     for, so the event fires once per silence, not at every refresh.
+//     for, so the event fires once per silence, not at every refresh;
+//   - history: oldest month ('YYYY-MM') the history import has published, or
+//     'done', so a restart resumes the import instead of starting it over.
 // No credential is ever stored here: they live in the Gladys configuration.
 // -----------------------------------------------------------------------------
 

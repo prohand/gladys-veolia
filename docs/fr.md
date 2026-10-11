@@ -36,6 +36,14 @@ exemple, Metz (57000) répond « Compatible, portail eau.veolia.fr ».
 À l'ajout de l'appareil, l'historique connu (le mois en cours et le mois
 précédent) est envoyé à Gladys, **à la date de chaque relevé**.
 
+Ensuite, l'intégration récupère chez Veolia les **24 mois précédents** et les
+range aussi à leur date : les graphiques de Gladys peuvent alors montrer les
+années passées. Cet import se fait en tâche de fond, un mois toutes les
+20 secondes (environ 8 minutes). Il n'y a aucun fichier à fournir : Veolia
+garde l'historique. Si Gladys efface les anciens états (réglage de
+conservation de l'historique dans **Paramètres → Système**), choisissez une
+durée d'au moins 2 ans pour les garder.
+
 ## L'appareil « Compteur d'eau »
 
 | Valeur                   | Unité | Ce que c'est                                             |
@@ -60,6 +68,12 @@ un graphique par jour (7, 14 ou 30 jours, au choix dans le widget), la date et
 la fiabilité du dernier relevé (mesuré ou estimé), et un bouton
 **Rafraîchir**. Si vous avez plusieurs compteurs, choisissez-le dans les
 réglages du widget.
+
+Le widget **Eau : comparaison des années** montre la consommation de chaque
+mois des 3 dernières années, côte à côte, le total de chaque année, et
+l'écart avec l'an dernier sur la même période (de janvier au dernier mois
+complet). Ses chiffres viennent directement de Veolia : il marche même si
+Gladys n'a pas gardé l'historique.
 
 ## Scènes
 

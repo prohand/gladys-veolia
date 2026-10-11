@@ -11,7 +11,13 @@ import { VeoliaClient } from '../../src/veolia/client.js';
 import { createFakeGladys } from './fakeGladys.js';
 import { ACCOUNT, createFakePortal } from './fakeVeolia.js';
 
-export function setup({ daily = [], monthly = [], today = '2026-10-10', config = {} } = {}) {
+export function setup({
+  daily = [],
+  monthly = [],
+  today = '2026-10-10',
+  config = {},
+  sleep = async () => {},
+} = {}) {
   const gladys = createFakeGladys();
   const portal = createFakePortal({ daily, monthly });
   const clock = { now: Date.parse(`${today}T10:00:00Z`) };
@@ -30,6 +36,7 @@ export function setup({ daily = [], monthly = [], today = '2026-10-10', config =
         sleep: async () => {},
       }),
     onUpdate: () => gladys.requestWidgetRefresh('water_consumption'),
+    sleep,
   });
   sync.setConfig(normalizeConfig({ email: ACCOUNT.email, password: ACCOUNT.password, ...config }));
   return { gladys, portal, clock, store, storeFile, sync };

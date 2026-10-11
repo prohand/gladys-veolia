@@ -6,6 +6,16 @@ All notable changes to this integration are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Past consumption: once the meter is added, the 24 previous months of daily
+  readings are imported from Veolia into the Gladys history, dated on their
+  day (in the background, about 8 minutes), so the Gladys charts show the past
+  years. No file to import: Veolia keeps the history.
+- Dashboard widget "Water: year comparison": the monthly consumption of the
+  last 3 years side by side, each year's total, and the change against last
+  year over the same months.
+
 ## [1.0.1] - 2026-10-10
 
 ### Added
