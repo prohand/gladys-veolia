@@ -6,6 +6,8 @@ All notable changes to this integration are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-10-11
+
 ### Added
 
 - Past consumption: once the meter is added, the 24 previous months of daily
@@ -41,5 +43,6 @@ All notable changes to this integration are documented here. The format follows
   image and runs the store admission checks; Dependabot keeps the npm
   dependencies, the GitHub Actions and the Docker base image up to date.
 
-[Unreleased]: https://github.com/prohand/gladys-veolia/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/prohand/gladys-veolia/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/prohand/gladys-veolia/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/prohand/gladys-veolia/releases/tag/v1.0.1
