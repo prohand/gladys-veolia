@@ -138,6 +138,41 @@ export function summarize({ daily, monthly, today }) {
   };
 }
 
+// Years shown side by side by the comparison widget (the current one included).
+export const COMPARISON_YEARS = 3;
+
+/**
+ * The monthly totals of the last `years` years, for the comparison widget.
+ * `samePeriod` sums January to the last full month, so a year in progress is
+ * compared with the same months of the others, never with a whole year.
+ * @returns {Array<{ year: number, months: Array<number | null>, total: number, samePeriod: number | null }>}
+ *   oldest first; a year with no data at all is left out
+ */
+export function yearlyComparison({ daily, monthly, today, years = COMPARISON_YEARS }) {
+  const current = monthOf(today);
+  const lastFull = current.month - 1;
+  const result = [];
+  for (let year = current.year - years + 1; year <= current.year; year += 1) {
+    const months = [];
+    for (let month = 1; month <= 12; month += 1) {
+      const future = year === current.year && month > current.month;
+      months.push(future ? null : monthM3(daily, monthly, { year, month }));
+    }
+    if (months.every((m) => m === null)) {
+      continue;
+    }
+    const sum = (list) => round3(list.reduce((total, m) => total + (m ?? 0), 0));
+    const full = months.slice(0, lastFull);
+    result.push({
+      year,
+      months,
+      total: sum(months),
+      samePeriod: lastFull > 0 && full.some((m) => m !== null) ? sum(full) : null,
+    });
+  }
+  return result;
+}
+
 /**
  * The consumption of a period, for the `get_consumption` scene action.
  * @returns {{ liters: number, cubic_meters: number, date: string } | null}

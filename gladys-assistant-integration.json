@@ -517,6 +517,30 @@
           ]
         }
       ]
+    },
+    {
+      "key": "water_comparison",
+      "label": {
+        "en": "Water: year comparison",
+        "fr": "Eau : comparaison des années"
+      },
+      "description": {
+        "en": "Monthly water consumption of the last 3 years, side by side.",
+        "fr": "Consommation d'eau par mois des 3 dernières années, côte à côte."
+      },
+      "icon": "bar-chart-2",
+      "action_timeout_seconds": 90,
+      "settings": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Meter",
+            "fr": "Compteur"
+          }
+        }
+      ]
     }
   ]
 }

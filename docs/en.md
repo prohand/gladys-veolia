@@ -36,6 +36,13 @@ town** button with your postal code. For example, Metz (57000) answers
 When the device is added, the known history (the current and the previous
 month) is sent to Gladys, **dated on each reading day**.
 
+Then the integration fetches the **24 previous months** from Veolia, dated on
+their day too, so the Gladys charts can show the past years. The import runs
+in the background, one month every 20 seconds (about 8 minutes). There is no
+file to provide: Veolia keeps the history. If Gladys deletes old states (the
+history retention setting in **Settings → System**), pick at least 2 years to
+keep them.
+
 ## The "Water meter" device
 
 | Value                    | Unit | Meaning                                         |
@@ -59,6 +66,11 @@ Add the **Water consumption** widget: last day, month, year, index, a daily
 chart (7, 14 or 30 days, set in the widget), the date and reliability of the
 last reading (measured or estimated), and a **Refresh** button. With several
 meters, pick one in the widget settings.
+
+The **Water: year comparison** widget shows the consumption of each month of
+the last 3 years side by side, the total of each year, and the change against
+last year over the same period (January to the last full month). Its figures
+come straight from Veolia: it works even if Gladys did not keep the history.
 
 ## Scenes
 

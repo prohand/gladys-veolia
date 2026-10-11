@@ -7,22 +7,27 @@
 // its result, so the portal is never read twice in parallel.
 //
 // Each refresh reads, per subscription, the daily readings of the previous and
-// the current month and the monthly totals of the current year (plus the
-// previous year in January, for "previous month"): 3 to 4 requests. The data
-// lives in memory between refreshes: the widget, the scene actions and the
-// device creation never call Veolia themselves.
+// the current month and the monthly totals of the last COMPARISON_YEARS years
+// (the comparison widget): about 5 requests. The data lives in memory between
+// refreshes: the widget, the scene actions and the device creation never call
+// Veolia themselves.
+//
+// Once a meter is added in Gladys, its older daily readings (HISTORY_MONTHS
+// back) are imported in the background, one month at a time, so the Gladys
+// charts can show the past years: Veolia keeps them, users asked for them.
 // -----------------------------------------------------------------------------
 
 import { createLogger, DEVICE_TRANSPORTS } from '@gladysassistant/integration-sdk';
 import { VeoliaApiError, VeoliaAuthError, VeoliaClient } from './veolia/client.js';
 import {
+  COMPARISON_YEARS,
   localDate,
   monthOf,
   normalizeDaily,
   normalizeMonthly,
   summarize,
 } from './veolia/consumption.js';
-import { buildDevice, buildStates, meterIds } from './meter.js';
+import { buildDevice, buildReadingStates, buildStates, meterIds } from './meter.js';
 import { isConfigured } from './config.js';
 import { MESSAGES, gladysFailed, unreachable } from './status.js';
 
@@ -37,6 +42,19 @@ export const TRIGGERS = {
 // The SDK caps a publishStates batch at 100 states.
 const STATES_PER_BATCH = 100;
 
+// Months of daily readings imported into the Gladys history, before the two
+// the refreshes already publish.
+export const HISTORY_MONTHS = 24;
+// Pause between two imported months. A month is at most 62 states: about 190
+// states a minute, under the host API's 300, with room left for the refreshes,
+// and one request every 20 s is gentle on the Veolia portal.
+const HISTORY_PAUSE_MS = 20_000;
+// store `history` value once the import reached its oldest month.
+const HISTORY_DONE = 'done';
+
+const monthIndex = (m) => m.year * 12 + m.month;
+const monthLabel = (m) => `${m.year}-${String(m.month).padStart(2, '0')}`;
+
 export class VeoliaSync {
   /**
    * @param {object} gladys the SDK instance
@@ -45,8 +63,18 @@ export class VeoliaSync {
    * @param {(config) => VeoliaClient} [options.createClient]
    * @param {() => number} [options.now]
    * @param {() => void} [options.onUpdate] called after each refresh (widgets)
+   * @param {(ms: number) => Promise<void>} [options.sleep] history import pacing
    */
-  constructor(gladys, { store, createClient, now = Date.now, onUpdate = () => {} }) {
+  constructor(
+    gladys,
+    {
+      store,
+      createClient,
+      now = Date.now,
+      onUpdate = () => {},
+      sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+    },
+  ) {
     this.gladys = gladys;
     this.store = store;
     this.createClient =
@@ -59,6 +87,11 @@ export class VeoliaSync {
         }));
     this.now = now;
     this.onUpdate = onUpdate;
+    this.sleep = sleep;
+    this.importing = null;
+    // The refresh and the history import take turns on the Veolia client: two
+    // sign-ins in parallel (expired token) would make each other's token stale.
+    this.portalTurn = Promise.resolve();
     this.config = null;
     this.client = null;
     this.subscriptions = null;
@@ -141,17 +174,20 @@ export class VeoliaSync {
     }
     const { client, generation } = this;
     try {
-      if (!this.subscriptions) {
-        this.subscriptions = await client.getSubscriptions();
-      }
-      if (this.subscriptions.length === 0) {
+      const read = await this.withPortal(async () => {
+        if (!this.subscriptions) {
+          this.subscriptions = await client.getSubscriptions();
+        }
+        const meters = [];
+        for (const subscription of this.subscriptions) {
+          meters.push(await this.readMeter(client, subscription));
+        }
+        return meters;
+      });
+      if (read.length === 0) {
         this.subscriptions = null; // ask again next time
         await this.reportStatus(false, MESSAGES.noSubscription);
         return { ok: false, message: MESSAGES.noSubscription };
-      }
-      const read = [];
-      for (const subscription of this.subscriptions) {
-        read.push(await this.readMeter(client, subscription));
       }
       if (generation !== this.generation) {
         // The account changed while reading: drop it, the new one is next.
@@ -175,6 +211,8 @@ export class VeoliaSync {
       this.lastError = null;
       await this.reportStatus(true);
       await this.publishTransports(true);
+      // Not awaited: the import takes minutes, the refresh answers now.
+      this.importHistory();
       return { ok: true };
     } catch (err) {
       let message;
@@ -202,21 +240,27 @@ export class VeoliaSync {
     }
   }
 
+  /** Run `task` once the other users of the Veolia client are done. */
+  withPortal(task) {
+    const turn = this.portalTurn.then(task);
+    this.portalTurn = turn.catch(() => {});
+    return turn;
+  }
+
   async readMeter(client, subscription) {
     const today = this.today();
     const current = monthOf(today);
     const previous = monthOf(today, -1);
     // The endpoints refuse a period before the subscription started.
     const start = monthOf(subscription.startDate);
-    const afterStart = (m) => m.year * 12 + m.month >= start.year * 12 + start.month;
+    const afterStart = (m) => monthIndex(m) >= monthIndex(start);
 
     const dailyRecords = [];
     for (const m of [previous, current].filter(afterStart)) {
       dailyRecords.push(...(await client.getDailyReadings(subscription, m.year, m.month)));
     }
-    const years = new Set([current.year, previous.year]);
     const monthlyRecords = [];
-    for (const year of years) {
+    for (let year = current.year - COMPARISON_YEARS + 1; year <= current.year; year += 1) {
       if (year >= start.year) {
         monthlyRecords.push(...(await client.getMonthlyTotals(subscription, year)));
       }
@@ -261,7 +305,70 @@ export class VeoliaSync {
       return;
     }
     this.store.set(meter.subscription.pds, 'published', null);
+    // A device deleted then added again has lost its history: import it again.
+    this.store.set(meter.subscription.pds, 'history', null);
     await this.publishMeter(meter);
+    this.importHistory();
+  }
+
+  /**
+   * Import the older daily readings of the added meters, or join the import in
+   * progress. Never throws: a failure is logged and the import resumes from
+   * the month it stopped at, after the next refresh.
+   */
+  importHistory() {
+    if (!this.importing) {
+      this.importing = this.doImportHistory()
+        .catch((err) => logger.warn(`History import paused: ${err.message}`))
+        .finally(() => {
+          this.importing = null;
+        });
+    }
+    return this.importing;
+  }
+
+  async doImportHistory() {
+    const { client, generation } = this;
+    let first = true;
+    for (const meter of [...this.meters.values()]) {
+      const { pds, startDate } = meter.subscription;
+      const done = this.store.get(pds, 'history');
+      if (!client || done === HISTORY_DONE || !this.isCreated(meter)) {
+        continue;
+      }
+      // The refreshes publish the current and the previous month: start
+      // before them, newest first, so an interrupted import still left the
+      // most useful months.
+      const today = this.today();
+      const oldest = Math.max(
+        monthIndex(monthOf(startDate)),
+        monthIndex(monthOf(today, -HISTORY_MONTHS - 1)),
+      );
+      let month = done ? monthOf(`${done}-01`, -1) : monthOf(today, -2);
+      let imported = 0;
+      while (monthIndex(month) >= oldest) {
+        if (!first) {
+          await this.sleep(HISTORY_PAUSE_MS);
+        }
+        first = false;
+        if (generation !== this.generation || !this.isCreated(meter)) {
+          return; // new account, or device deleted meanwhile
+        }
+        const { year, month: number } = month;
+        const readings = normalizeDaily(
+          await this.withPortal(() => client.getDailyReadings(meter.subscription, year, number)),
+        );
+        const states = buildReadingStates(this.gladys, pds, readings);
+        for (let i = 0; i < states.length; i += STATES_PER_BATCH) {
+          await this.gladys.publishStates(states.slice(i, i + STATES_PER_BATCH));
+        }
+        imported += readings.length;
+        this.store.set(pds, 'history', monthLabel(month));
+        month = monthOf(`${monthLabel(month)}-01`, -1);
+      }
+      this.store.set(pds, 'history', HISTORY_DONE);
+      logger.info(`Meter ${pds}: history imported (${imported} daily reading(s))`);
+    }
   }
 
   async fireEvents(meter) {

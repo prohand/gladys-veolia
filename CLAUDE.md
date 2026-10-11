@@ -55,9 +55,11 @@ connection lifecycle — and holds no Veolia logic.
   Dates are French calendar days (`Europe/Paris`).
 - **`src/meter.js`** — subscription → device payload and states.
 - **`src/sync.js`** — `VeoliaSync`: one refresh at a time (concurrent callers join it), publishes
-  only the new readings, fires the scene triggers, reports the connection status.
+  only the new readings, fires the scene triggers, reports the connection status. Once a meter is
+  added, imports its `HISTORY_MONTHS` older months in the background (`importHistory`).
+  The refresh and the import take turns on the Veolia client (`withPortal`).
 - **`src/store.js`** — `/data/veolia-state.json`: per PDS, last published reading, last reading
-  seen by the triggers, last overdue event.
+  seen by the triggers, last overdue event, history import progress.
 - **`src/scenes.js`**, **`src/widgets.js`** — capability handlers, keyed by the manifest keys.
 
 ### Decisions that look arbitrary without their reason
@@ -70,6 +72,13 @@ connection lifecycle — and holds no Veolia logic.
 - **The core drops states of a feature that does not exist yet.** Nothing is published until the
   user adds the device (`gladys.devices`); `onDeviceCreated` then sends the known history. The
   `published` date only moves after a successful publication.
+- **The history comes from Veolia, not from a file**: the SDK has no file field, and the portal
+  keeps the daily readings. The import goes newest month first, one month every 20 s (≤ 62
+  states: under the host API's 300 states/minute), and resumes from the `history` month in the
+  store after a failure or a restart. Deleting and re-adding the device imports again.
+- **The comparison widget draws every year on the current year's months** (`t` = this year's
+  month): a chart series is a time series, this is how bars of the same month stand side by side.
+  Its figures are the Veolia monthly totals, so it works whatever the Gladys state retention.
 - **No `poll_frequency`**: the core's polling is an enum capped at one minute; Veolia updates once
   a day.
 - **Triggers never fire on the first refresh** (the readings are history, not news), and a

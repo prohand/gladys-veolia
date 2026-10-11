@@ -36,13 +36,18 @@ does.
   `unreachable` when it does not, orange dot (degraded) when no reading came
   for `overdue_days`. No `local` channel: the data only exists on the Veolia
   cloud, so the manifest declares `transports: ["cloud"]`.
-- Refresh every `refresh_hours` (default 6 h), 3 to 4 requests per refresh.
+- Refresh every `refresh_hours` (default 6 h), about 5 requests per refresh.
+- **History import**: once the meter is added, the 24 previous months of daily
+  readings are fetched from Veolia (one month every 20 s) and stored on their
+  day in the Gladys history.
 - **Scene triggers**: `new_reading`, `high_consumption` (threshold in the
   configuration), `reading_overdue`.
 - **Scene actions**: `refresh_consumption`, `get_consumption` (last day, this
   month, last month, this year).
 - **Dashboard widget** `water_consumption`: tiles, daily chart (7/14/30 days),
-  reading date and reliability, refresh button.
+  reading date and reliability, refresh button; `water_comparison`: monthly
+  consumption of the last 3 years side by side, year totals, change against
+  last year.
 - **Configuration actions**: _Test the connection_, _Check my town_ (postal
   code → Veolia portal, no account needed).
 
@@ -61,7 +66,7 @@ Requires **Gladys 5.1.0 or later** (scene and widget capability fields).
 │  ├─ sync.js                  # refresh cycle: read, publish, fire scene triggers
 │  ├─ store.js                 # small persisted state in /data
 │  ├─ scenes.js                # scene actions
-│  ├─ widgets.js               # dashboard widget
+│  ├─ widgets.js               # dashboard widgets
 │  ├─ status.js                # bilingual messages
 │  └─ config.js                # config defaults + normalization
 ├─ docs/fr.md, docs/en.md      # user documentation (re-hosted by Gladys)

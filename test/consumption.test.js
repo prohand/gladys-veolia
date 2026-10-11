@@ -10,6 +10,7 @@ import {
   normalizeMonthly,
   reliabilityOf,
   summarize,
+  yearlyComparison,
 } from '../src/veolia/consumption.js';
 import { dailyRecord } from './helpers/fakeVeolia.js';
 
@@ -120,4 +121,42 @@ test('reliabilityOf simplifies the Veolia codes', () => {
   assert.equal(reliabilityOf('MESURE'), 'measured');
   assert.equal(reliabilityOf('ESTIME'), 'estimated');
   assert.equal(reliabilityOf(null), 'unknown');
+});
+
+test('yearlyComparison: three years per month, same period up to the last full month', () => {
+  const monthly = normalizeMonthly([
+    { annee: 2024, mois: 1, consommation: { m3: 5 } },
+    { annee: 2024, mois: 12, consommation: { m3: 6 } },
+    { annee: 2025, mois: 1, consommation: { m3: 4 } },
+    { annee: 2025, mois: 9, consommation: { m3: 3 } },
+    { annee: 2025, mois: 10, consommation: { m3: 9 } },
+    { annee: 2026, mois: 1, consommation: { m3: 2 } },
+    { annee: 2026, mois: 9, consommation: { m3: 2.5 } },
+  ]);
+  const daily = normalizeDaily([
+    dailyRecord('2026-10-01', 300, 1),
+    dailyRecord('2026-10-02', 200, 1),
+  ]);
+  const years = yearlyComparison({ daily, monthly, today: '2026-10-10' });
+  assert.deepEqual(
+    years.map((y) => y.year),
+    [2024, 2025, 2026],
+  );
+  const [y2024, y2025, y2026] = years;
+  assert.equal(y2024.total, 11);
+  assert.equal(y2024.samePeriod, 5, 'January to September');
+  assert.equal(y2025.samePeriod, 7, 'October 2025 left out');
+  assert.equal(y2026.months[9], 0.5, 'the current month comes from the daily readings');
+  assert.equal(y2026.months[10], null, 'no future month');
+  assert.equal(y2026.total, 5);
+  assert.equal(y2026.samePeriod, 4.5);
+});
+
+test('yearlyComparison: a year without data is left out, January has no same period', () => {
+  const monthly = normalizeMonthly([{ annee: 2026, mois: 1, consommation: { m3: 2 } }]);
+  const years = yearlyComparison({ daily: [], monthly, today: '2026-01-20' });
+  assert.deepEqual(
+    years.map((y) => [y.year, y.samePeriod]),
+    [[2026, null]],
+  );
 });
