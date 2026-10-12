@@ -6,8 +6,8 @@
     "en": "Your water consumption from your Veolia customer account (eau.veolia.fr).",
     "fr": "Votre consommation d'eau depuis votre espace client Veolia (eau.veolia.fr)."
   },
-  "version": "1.0.2",
-  "docker_image": "ghcr.io/prohand/gladys-veolia:1.0.2",
+  "version": "1.0.3",
+  "docker_image": "ghcr.io/prohand/gladys-veolia:1.0.3",
   "gladys_version": ">=5.1.0",
   "cover_image": "https://raw.githubusercontent.com/prohand/gladys-veolia/main/cover.png",
   "categories": ["energy", "environment"],
