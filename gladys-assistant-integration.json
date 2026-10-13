@@ -4,7 +4,9 @@
   "name": "Veolia",
   "description": {
     "en": "Your water consumption from your Veolia customer account (eau.veolia.fr).",
-    "fr": "Votre consommation d'eau depuis votre espace client Veolia (eau.veolia.fr)."
+    "fr": "Votre consommation d'eau depuis votre espace client Veolia (eau.veolia.fr).",
+    "de": "Dein Wasserverbrauch aus deinem Veolia-Kundenkonto (eau.veolia.fr).",
+    "es": "Su consumo de agua desde su área de cliente de Veolia (eau.veolia.fr)."
   },
   "version": "1.0.3",
   "docker_image": "ghcr.io/prohand/gladys-veolia:1.0.3",
@@ -18,25 +20,33 @@
       "type": "section",
       "label": {
         "en": "Getting started",
-        "fr": "Pour commencer"
+        "fr": "Pour commencer",
+        "de": "Erste Schritte",
+        "es": "Primeros pasos"
       },
       "description": {
         "en": "Your home needs a remote-read water meter (télérelève) and a Veolia customer account. Enter the e-mail and password you use on the Veolia website. Not sure your town is served by Veolia? Use the \"Check my town\" button below.",
-        "fr": "Votre logement doit avoir un compteur d'eau télérelevé et un espace client Veolia. Indiquez l'e-mail et le mot de passe utilisés sur le site Veolia. Un doute sur votre commune ? Utilisez le bouton « Vérifier ma commune » ci-dessous."
+        "fr": "Votre logement doit avoir un compteur d'eau télérelevé et un espace client Veolia. Indiquez l'e-mail et le mot de passe utilisés sur le site Veolia. Un doute sur votre commune ? Utilisez le bouton « Vérifier ma commune » ci-dessous.",
+        "de": "Dein Zuhause braucht einen fernablesbaren Wasserzähler (télérelève) und ein Veolia-Kundenkonto. Gib die E-Mail-Adresse und das Passwort ein, die du auf der Veolia-Website verwendest. Du bist nicht sicher, ob deine Gemeinde von Veolia versorgt wird? Nutze unten die Schaltfläche „Meine Gemeinde prüfen“.",
+        "es": "Su vivienda necesita un contador de agua con telelectura (télérelève) y un área de cliente de Veolia. Introduzca el e-mail y la contraseña que usa en la web de Veolia. ¿No sabe si Veolia abastece su municipio? Use el botón «Comprobar mi municipio» de abajo."
       },
       "links": [
         {
           "url": "https://github.com/prohand/gladys-veolia/blob/main/docs/fr.md",
           "label": {
             "en": "Step-by-step guide",
-            "fr": "Guide pas à pas"
+            "fr": "Guide pas à pas",
+            "de": "Schritt-für-Schritt-Anleitung",
+            "es": "Guía paso a paso"
           }
         },
         {
           "url": "https://www.eau.veolia.fr",
           "label": {
             "en": "Veolia customer portal",
-            "fr": "Espace client Veolia"
+            "fr": "Espace client Veolia",
+            "de": "Veolia-Kundenportal",
+            "es": "Área de cliente de Veolia"
           }
         }
       ]
@@ -46,15 +56,21 @@
       "type": "string",
       "label": {
         "en": "Veolia e-mail",
-        "fr": "E-mail Veolia"
+        "fr": "E-mail Veolia",
+        "de": "Veolia-E-Mail",
+        "es": "E-mail de Veolia"
       },
       "description": {
         "en": "The e-mail address of your Veolia customer account.",
-        "fr": "L'adresse e-mail de votre espace client Veolia."
+        "fr": "L'adresse e-mail de votre espace client Veolia.",
+        "de": "Die E-Mail-Adresse deines Veolia-Kundenkontos.",
+        "es": "La dirección de e-mail de su área de cliente de Veolia."
       },
       "placeholder": {
         "en": "e.g. me@example.com",
-        "fr": "ex. moi@exemple.fr"
+        "fr": "ex. moi@exemple.fr",
+        "de": "z. B. ich@beispiel.de",
+        "es": "p. ej. yo@ejemplo.es"
       },
       "required": true
     },
@@ -63,7 +79,9 @@
       "type": "secret",
       "label": {
         "en": "Veolia password",
-        "fr": "Mot de passe Veolia"
+        "fr": "Mot de passe Veolia",
+        "de": "Veolia-Passwort",
+        "es": "Contraseña de Veolia"
       },
       "required": true
     },
@@ -72,11 +90,15 @@
       "type": "select",
       "label": {
         "en": "Customer portal",
-        "fr": "Espace client"
+        "fr": "Espace client",
+        "de": "Kundenportal",
+        "es": "Área de cliente"
       },
       "description": {
         "en": "Keep eau.veolia.fr unless your town redirects you to its own Veolia portal.",
-        "fr": "Gardez eau.veolia.fr sauf si votre commune vous redirige vers son propre portail Veolia."
+        "fr": "Gardez eau.veolia.fr sauf si votre commune vous redirige vers son propre portail Veolia.",
+        "de": "Behalte eau.veolia.fr, außer deine Gemeinde leitet dich auf ein eigenes Veolia-Portal weiter.",
+        "es": "Deje eau.veolia.fr salvo que su municipio le redirija a su propio portal de Veolia."
       },
       "required": false,
       "default": "eau.veolia.fr",
@@ -85,14 +107,18 @@
           "value": "eau.veolia.fr",
           "label": {
             "en": "Veolia (eau.veolia.fr)",
-            "fr": "Veolia (eau.veolia.fr)"
+            "fr": "Veolia (eau.veolia.fr)",
+            "de": "Veolia (eau.veolia.fr)",
+            "es": "Veolia (eau.veolia.fr)"
           }
         },
         {
           "value": "eaudetm.monespace.eau.veolia.fr",
           "label": {
             "en": "Eau de Toulouse Métropole",
-            "fr": "Eau de Toulouse Métropole"
+            "fr": "Eau de Toulouse Métropole",
+            "de": "Eau de Toulouse Métropole",
+            "es": "Eau de Toulouse Métropole"
           }
         }
       ]
@@ -102,11 +128,15 @@
       "type": "number",
       "label": {
         "en": "Refresh interval (h)",
-        "fr": "Intervalle de rafraîchissement (h)"
+        "fr": "Intervalle de rafraîchissement (h)",
+        "de": "Aktualisierungsintervall (h)",
+        "es": "Intervalo de actualización (h)"
       },
       "description": {
         "en": "How often the Veolia portal is read, in hours. Veolia publishes one reading a day.",
-        "fr": "Fréquence de lecture du portail Veolia, en heures. Veolia publie un relevé par jour."
+        "fr": "Fréquence de lecture du portail Veolia, en heures. Veolia publie un relevé par jour.",
+        "de": "Wie oft das Veolia-Portal gelesen wird, in Stunden. Veolia veröffentlicht einen Messwert pro Tag.",
+        "es": "Cada cuánto se lee el portal de Veolia, en horas. Veolia publica una lectura al día."
       },
       "required": false,
       "default": 6,
@@ -118,15 +148,21 @@
       "type": "number",
       "label": {
         "en": "High consumption threshold (L/day)",
-        "fr": "Seuil de forte consommation (L/jour)"
+        "fr": "Seuil de forte consommation (L/jour)",
+        "de": "Schwelle für hohen Verbrauch (L/Tag)",
+        "es": "Umbral de consumo alto (L/día)"
       },
       "description": {
         "en": "A day at or above this many litres fires the \"High consumption\" scene trigger. 0 turns it off.",
-        "fr": "Une journée à ce nombre de litres ou plus lance le déclencheur de scène « Forte consommation ». 0 le désactive."
+        "fr": "Une journée à ce nombre de litres ou plus lance le déclencheur de scène « Forte consommation ». 0 le désactive.",
+        "de": "Ein Tag mit mindestens so vielen Litern löst den Szenen-Auslöser „Hoher Wasserverbrauch“ aus. 0 schaltet ihn ab.",
+        "es": "Un día con esta cantidad de litros o más lanza el activador de escena «Consumo de agua alto». 0 lo desactiva."
       },
       "placeholder": {
         "en": "e.g. 500",
-        "fr": "ex. 500"
+        "fr": "ex. 500",
+        "de": "z. B. 500",
+        "es": "p. ej. 500"
       },
       "required": false,
       "default": 0,
@@ -138,11 +174,15 @@
       "type": "number",
       "label": {
         "en": "Missing reading after (days)",
-        "fr": "Relevé manquant après (jours)"
+        "fr": "Relevé manquant après (jours)",
+        "de": "Fehlender Messwert nach (Tagen)",
+        "es": "Lectura ausente tras (días)"
       },
       "description": {
         "en": "Days without a new reading before the \"Reading overdue\" scene trigger fires.",
-        "fr": "Nombre de jours sans nouveau relevé avant le déclencheur de scène « Relevé en retard »."
+        "fr": "Nombre de jours sans nouveau relevé avant le déclencheur de scène « Relevé en retard ».",
+        "de": "Tage ohne neuen Messwert, bevor der Szenen-Auslöser „Wasser-Messwert überfällig“ auslöst.",
+        "es": "Días sin lectura nueva antes de que se lance el activador de escena «Lectura de agua atrasada»."
       },
       "required": false,
       "default": 3,
@@ -155,7 +195,9 @@
       "key": "test_connection",
       "label": {
         "en": "Test the connection",
-        "fr": "Tester la connexion"
+        "fr": "Tester la connexion",
+        "de": "Verbindung testen",
+        "es": "Probar la conexión"
       },
       "timeout_seconds": 90
     },
@@ -163,7 +205,9 @@
       "key": "check_town",
       "label": {
         "en": "Check my town",
-        "fr": "Vérifier ma commune"
+        "fr": "Vérifier ma commune",
+        "de": "Meine Gemeinde prüfen",
+        "es": "Comprobar mi municipio"
       },
       "timeout_seconds": 30,
       "fields": [
@@ -172,11 +216,15 @@
           "type": "string",
           "label": {
             "en": "Postal code",
-            "fr": "Code postal"
+            "fr": "Code postal",
+            "de": "Postleitzahl",
+            "es": "Código postal"
           },
           "placeholder": {
             "en": "e.g. 57000",
-            "fr": "ex. 57000"
+            "fr": "ex. 57000",
+            "de": "z. B. 57000",
+            "es": "p. ej. 57000"
           },
           "required": true
         }
@@ -188,11 +236,15 @@
       "key": "new_reading",
       "label": {
         "en": "New water reading",
-        "fr": "Nouveau relevé d'eau"
+        "fr": "Nouveau relevé d'eau",
+        "de": "Neuer Wasser-Messwert",
+        "es": "Nueva lectura de agua"
       },
       "description": {
         "en": "Veolia published the consumption of a new day.",
-        "fr": "Veolia a publié la consommation d'une nouvelle journée."
+        "fr": "Veolia a publié la consommation d'une nouvelle journée.",
+        "de": "Veolia hat den Verbrauch eines neuen Tages veröffentlicht.",
+        "es": "Veolia ha publicado el consumo de un nuevo día."
       },
       "fields": [
         {
@@ -201,7 +253,9 @@
           "source": "devices",
           "label": {
             "en": "Meter",
-            "fr": "Compteur"
+            "fr": "Compteur",
+            "de": "Zähler",
+            "es": "Contador"
           }
         }
       ],
@@ -211,7 +265,9 @@
           "type": "string",
           "label": {
             "en": "Reading date",
-            "fr": "Date du relevé"
+            "fr": "Date du relevé",
+            "de": "Datum des Messwerts",
+            "es": "Fecha de la lectura"
           }
         },
         {
@@ -219,7 +275,9 @@
           "type": "number",
           "label": {
             "en": "Litres used that day",
-            "fr": "Litres consommés ce jour-là"
+            "fr": "Litres consommés ce jour-là",
+            "de": "An diesem Tag verbrauchte Liter",
+            "es": "Litros consumidos ese día"
           }
         },
         {
@@ -227,7 +285,9 @@
           "type": "number",
           "label": {
             "en": "Meter index (m³)",
-            "fr": "Index du compteur (m³)"
+            "fr": "Index du compteur (m³)",
+            "de": "Zählerstand (m³)",
+            "es": "Índice del contador (m³)"
           }
         }
       ]
@@ -236,11 +296,15 @@
       "key": "high_consumption",
       "label": {
         "en": "High water consumption",
-        "fr": "Forte consommation d'eau"
+        "fr": "Forte consommation d'eau",
+        "de": "Hoher Wasserverbrauch",
+        "es": "Consumo de agua alto"
       },
       "description": {
         "en": "A day reached the threshold set in the configuration (possible leak).",
-        "fr": "Une journée a atteint le seuil réglé dans la configuration (fuite possible)."
+        "fr": "Une journée a atteint le seuil réglé dans la configuration (fuite possible).",
+        "de": "Ein Tag hat die in der Konfiguration eingestellte Schwelle erreicht (mögliches Leck).",
+        "es": "Un día ha alcanzado el umbral fijado en la configuración (posible fuga)."
       },
       "fields": [
         {
@@ -249,7 +313,9 @@
           "source": "devices",
           "label": {
             "en": "Meter",
-            "fr": "Compteur"
+            "fr": "Compteur",
+            "de": "Zähler",
+            "es": "Contador"
           }
         }
       ],
@@ -259,7 +325,9 @@
           "type": "string",
           "label": {
             "en": "Day",
-            "fr": "Jour"
+            "fr": "Jour",
+            "de": "Tag",
+            "es": "Día"
           }
         },
         {
@@ -267,7 +335,9 @@
           "type": "number",
           "label": {
             "en": "Litres used that day",
-            "fr": "Litres consommés ce jour-là"
+            "fr": "Litres consommés ce jour-là",
+            "de": "An diesem Tag verbrauchte Liter",
+            "es": "Litros consumidos ese día"
           }
         },
         {
@@ -275,7 +345,9 @@
           "type": "number",
           "label": {
             "en": "Threshold (L)",
-            "fr": "Seuil (L)"
+            "fr": "Seuil (L)",
+            "de": "Schwelle (L)",
+            "es": "Umbral (L)"
           }
         }
       ]
@@ -284,11 +356,15 @@
       "key": "reading_overdue",
       "label": {
         "en": "Water reading overdue",
-        "fr": "Relevé d'eau en retard"
+        "fr": "Relevé d'eau en retard",
+        "de": "Wasser-Messwert überfällig",
+        "es": "Lectura de agua atrasada"
       },
       "description": {
         "en": "No new reading for the number of days set in the configuration.",
-        "fr": "Aucun nouveau relevé depuis le nombre de jours réglé dans la configuration."
+        "fr": "Aucun nouveau relevé depuis le nombre de jours réglé dans la configuration.",
+        "de": "Kein neuer Messwert seit der in der Konfiguration eingestellten Anzahl von Tagen.",
+        "es": "Ninguna lectura nueva desde el número de días fijado en la configuración."
       },
       "fields": [
         {
@@ -297,7 +373,9 @@
           "source": "devices",
           "label": {
             "en": "Meter",
-            "fr": "Compteur"
+            "fr": "Compteur",
+            "de": "Zähler",
+            "es": "Contador"
           }
         }
       ],
@@ -307,7 +385,9 @@
           "type": "string",
           "label": {
             "en": "Last reading date",
-            "fr": "Date du dernier relevé"
+            "fr": "Date du dernier relevé",
+            "de": "Datum des letzten Messwerts",
+            "es": "Fecha de la última lectura"
           }
         },
         {
@@ -315,7 +395,9 @@
           "type": "number",
           "label": {
             "en": "Days without reading",
-            "fr": "Jours sans relevé"
+            "fr": "Jours sans relevé",
+            "de": "Tage ohne Messwert",
+            "es": "Días sin lectura"
           }
         }
       ]
@@ -326,11 +408,15 @@
       "key": "refresh_consumption",
       "label": {
         "en": "Refresh the water consumption",
-        "fr": "Rafraîchir la consommation d'eau"
+        "fr": "Rafraîchir la consommation d'eau",
+        "de": "Wasserverbrauch aktualisieren",
+        "es": "Actualizar el consumo de agua"
       },
       "description": {
         "en": "Read the Veolia portal now and return the latest reading.",
-        "fr": "Lit le portail Veolia maintenant et renvoie le dernier relevé."
+        "fr": "Lit le portail Veolia maintenant et renvoie le dernier relevé.",
+        "de": "Liest jetzt das Veolia-Portal und gibt den neuesten Messwert zurück.",
+        "es": "Lee ahora el portal de Veolia y devuelve la lectura más reciente."
       },
       "timeout_seconds": 90,
       "fields": [
@@ -340,7 +426,9 @@
           "source": "devices",
           "label": {
             "en": "Meter",
-            "fr": "Compteur"
+            "fr": "Compteur",
+            "de": "Zähler",
+            "es": "Contador"
           }
         }
       ],
@@ -350,7 +438,9 @@
           "type": "string",
           "label": {
             "en": "Reading date",
-            "fr": "Date du relevé"
+            "fr": "Date du relevé",
+            "de": "Datum des Messwerts",
+            "es": "Fecha de la lectura"
           }
         },
         {
@@ -358,7 +448,9 @@
           "type": "number",
           "label": {
             "en": "Litres used that day",
-            "fr": "Litres consommés ce jour-là"
+            "fr": "Litres consommés ce jour-là",
+            "de": "An diesem Tag verbrauchte Liter",
+            "es": "Litros consumidos ese día"
           }
         },
         {
@@ -366,7 +458,9 @@
           "type": "number",
           "label": {
             "en": "Meter index (m³)",
-            "fr": "Index du compteur (m³)"
+            "fr": "Index du compteur (m³)",
+            "de": "Zählerstand (m³)",
+            "es": "Índice del contador (m³)"
           }
         }
       ]
@@ -375,11 +469,15 @@
       "key": "get_consumption",
       "label": {
         "en": "Get the water consumption",
-        "fr": "Obtenir la consommation d'eau"
+        "fr": "Obtenir la consommation d'eau",
+        "de": "Wasserverbrauch abrufen",
+        "es": "Obtener el consumo de agua"
       },
       "description": {
         "en": "The consumption of a period, for the next actions (message, condition...).",
-        "fr": "La consommation d'une période, pour les actions suivantes (message, condition…)."
+        "fr": "La consommation d'une période, pour les actions suivantes (message, condition…).",
+        "de": "Der Verbrauch eines Zeitraums, für die nächsten Aktionen (Nachricht, Bedingung…).",
+        "es": "El consumo de un periodo, para las siguientes acciones (mensaje, condición…)."
       },
       "timeout_seconds": 90,
       "fields": [
@@ -389,7 +487,9 @@
           "source": "devices",
           "label": {
             "en": "Meter",
-            "fr": "Compteur"
+            "fr": "Compteur",
+            "de": "Zähler",
+            "es": "Contador"
           }
         },
         {
@@ -397,7 +497,9 @@
           "type": "select",
           "label": {
             "en": "Period",
-            "fr": "Période"
+            "fr": "Période",
+            "de": "Zeitraum",
+            "es": "Periodo"
           },
           "required": true,
           "default": "last_day",
@@ -406,28 +508,36 @@
               "value": "last_day",
               "label": {
                 "en": "Last reading day",
-                "fr": "Dernier jour relevé"
+                "fr": "Dernier jour relevé",
+                "de": "Letzter abgelesener Tag",
+                "es": "Último día leído"
               }
             },
             {
               "value": "current_month",
               "label": {
                 "en": "This month",
-                "fr": "Ce mois-ci"
+                "fr": "Ce mois-ci",
+                "de": "Dieser Monat",
+                "es": "Este mes"
               }
             },
             {
               "value": "previous_month",
               "label": {
                 "en": "Last month",
-                "fr": "Le mois dernier"
+                "fr": "Le mois dernier",
+                "de": "Letzter Monat",
+                "es": "El mes pasado"
               }
             },
             {
               "value": "current_year",
               "label": {
                 "en": "This year",
-                "fr": "Cette année"
+                "fr": "Cette année",
+                "de": "Dieses Jahr",
+                "es": "Este año"
               }
             }
           ]
@@ -439,7 +549,9 @@
           "type": "number",
           "label": {
             "en": "Litres",
-            "fr": "Litres"
+            "fr": "Litres",
+            "de": "Liter",
+            "es": "Litros"
           }
         },
         {
@@ -447,7 +559,9 @@
           "type": "number",
           "label": {
             "en": "Cubic metres",
-            "fr": "Mètres cubes"
+            "fr": "Mètres cubes",
+            "de": "Kubikmeter",
+            "es": "Metros cúbicos"
           }
         },
         {
@@ -455,7 +569,9 @@
           "type": "string",
           "label": {
             "en": "Day, month or year",
-            "fr": "Jour, mois ou année"
+            "fr": "Jour, mois ou année",
+            "de": "Tag, Monat oder Jahr",
+            "es": "Día, mes o año"
           }
         }
       ]
@@ -466,11 +582,15 @@
       "key": "water_consumption",
       "label": {
         "en": "Water consumption",
-        "fr": "Consommation d'eau"
+        "fr": "Consommation d'eau",
+        "de": "Wasserverbrauch",
+        "es": "Consumo de agua"
       },
       "description": {
         "en": "Last day, month, year and index, with a daily chart.",
-        "fr": "Dernier jour, mois, année et index, avec un graphique par jour."
+        "fr": "Dernier jour, mois, année et index, avec un graphique par jour.",
+        "de": "Letzter Tag, Monat, Jahr und Zählerstand, mit einem Tagesdiagramm.",
+        "es": "Último día, mes, año e índice, con un gráfico diario."
       },
       "icon": "droplet",
       "action_timeout_seconds": 90,
@@ -481,7 +601,9 @@
           "source": "devices",
           "label": {
             "en": "Meter",
-            "fr": "Compteur"
+            "fr": "Compteur",
+            "de": "Zähler",
+            "es": "Contador"
           }
         },
         {
@@ -489,7 +611,9 @@
           "type": "select",
           "label": {
             "en": "Chart period",
-            "fr": "Période du graphique"
+            "fr": "Période du graphique",
+            "de": "Diagrammzeitraum",
+            "es": "Periodo del gráfico"
           },
           "default": "14",
           "options": [
@@ -497,21 +621,27 @@
               "value": "7",
               "label": {
                 "en": "7 days",
-                "fr": "7 jours"
+                "fr": "7 jours",
+                "de": "7 Tage",
+                "es": "7 días"
               }
             },
             {
               "value": "14",
               "label": {
                 "en": "14 days",
-                "fr": "14 jours"
+                "fr": "14 jours",
+                "de": "14 Tage",
+                "es": "14 días"
               }
             },
             {
               "value": "30",
               "label": {
                 "en": "30 days",
-                "fr": "30 jours"
+                "fr": "30 jours",
+                "de": "30 Tage",
+                "es": "30 días"
               }
             }
           ]
@@ -522,11 +652,15 @@
       "key": "water_comparison",
       "label": {
         "en": "Water: year comparison",
-        "fr": "Eau : comparaison des années"
+        "fr": "Eau : comparaison des années",
+        "de": "Wasser: Jahresvergleich",
+        "es": "Agua: comparación anual"
       },
       "description": {
         "en": "Monthly water consumption of the last 3 years, side by side.",
-        "fr": "Consommation d'eau par mois des 3 dernières années, côte à côte."
+        "fr": "Consommation d'eau par mois des 3 dernières années, côte à côte.",
+        "de": "Monatlicher Wasserverbrauch der letzten 3 Jahre, nebeneinander.",
+        "es": "Consumo de agua mensual de los últimos 3 años, uno al lado del otro."
       },
       "icon": "bar-chart-2",
       "action_timeout_seconds": 90,
@@ -537,7 +671,9 @@
           "source": "devices",
           "label": {
             "en": "Meter",
-            "fr": "Compteur"
+            "fr": "Compteur",
+            "de": "Zähler",
+            "es": "Contador"
           }
         }
       ]

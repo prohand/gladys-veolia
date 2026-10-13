@@ -8,6 +8,7 @@ import { MESSAGES } from '../src/status.js';
 import { normalizeConfig } from '../src/config.js';
 import { ACCOUNT, dailyRange, dailyRecord } from './helpers/fakeVeolia.js';
 import { setToday, setup } from './helpers/setup.js';
+import { assertAllLanguages } from './helpers/languages.js';
 
 const manifest = JSON.parse(
   await readFile(new URL('../gladys-assistant-integration.json', import.meta.url), 'utf8'),
@@ -262,6 +263,8 @@ test('the transport badge follows the Veolia link and the reading delay', async 
   assert.equal(overdue.transport, 'cloud');
   assert.equal(overdue.degraded, true);
   assert.match(overdue.message.fr, /4 jours/);
+  assertAllLanguages(overdue.message, 'transport message');
+  assert.ok(Object.values(overdue.message).every((text) => text.length <= 200));
 
   portal.failures.push(
     { match: /journalieres/, status: 503 },

@@ -12,6 +12,7 @@ import { normalizeConfig } from '../src/config.js';
 import { dailyRange, dailyRecord } from './helpers/fakeVeolia.js';
 import { setup } from './helpers/setup.js';
 import { createFakeGladys } from './helpers/fakeGladys.js';
+import { assertAllLanguages } from './helpers/languages.js';
 
 const widget = WIDGETS[WATER_WIDGET];
 const getContent = (sync, settings = {}) =>
@@ -26,6 +27,7 @@ test('the content is rendered exactly as sent, for every chart period', async ()
   for (const days of CHART_DAYS) {
     const content = await getContent(sync, { days: String(days) });
     assert.deepEqual(validateWidgetContent(content), [], `days=${days}`);
+    assertAllLanguages(content, `days=${days}`);
     const chart = content.components.find((c) => c.type === 'chart');
     assert.equal(chart.series[0].points.length, days);
   }
@@ -36,6 +38,7 @@ test('an estimated, overdue reading is still a valid content', async () => {
   await sync.refresh();
   const content = await getContent(sync);
   assert.deepEqual(validateWidgetContent(content), []);
+  assertAllLanguages(content);
   const status = content.components.find((c) => c.type === 'status');
   assert.ok(status.items.some((item) => item.color === 'warning'));
 });
@@ -46,6 +49,7 @@ test('before any data, the widget explains why', async () => {
   await sync.refresh();
   const content = await getContent(sync);
   assert.deepEqual(validateWidgetContent(content), []);
+  assertAllLanguages(content);
   assert.equal(content.components[0].type, 'text');
 });
 
@@ -56,7 +60,8 @@ test('the refresh button is handled and answers a short toast', async () => {
   assert.equal(buttons.length, 1);
   for (const { action } of buttons) {
     const toast = await widget.action(sync, { actionKey: action.key, params: {}, settings: {} });
-    assert.ok(toast.en.length <= 200 && toast.fr.length <= 200);
+    assertAllLanguages(toast);
+    assert.ok(Object.values(toast).every((text) => text.length <= 200));
   }
 });
 
@@ -64,7 +69,8 @@ test('a failed refresh answers a short toast too', async () => {
   const { sync, portal } = setup();
   portal.acceptPassword = 'changed';
   const toast = await widget.action(sync, { actionKey: 'refresh', params: {}, settings: {} });
-  assert.ok(toast.en.length <= 200 && toast.fr.length <= 200);
+  assertAllLanguages(toast);
+  assert.ok(Object.values(toast).every((text) => text.length <= 200));
 });
 
 test('an unknown widget action fails', async () => {
@@ -91,6 +97,7 @@ test('the comparison widget shows each year on the same months', async () => {
   await sync.refresh();
   const content = await comparison.get(sync, { settings: {}, language: 'fr', units: 'metric' });
   assert.deepEqual(validateWidgetContent(content), []);
+  assertAllLanguages(content);
   const chart = content.components.find((c) => c.type === 'chart');
   assert.deepEqual(
     chart.series.map((serie) => [serie.name, serie.points.length]),

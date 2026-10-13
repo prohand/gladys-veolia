@@ -12,7 +12,8 @@ Built from the official
 [JavaScript template](https://github.com/GladysAssistant/integration-template-js)
 with [`@gladysassistant/integration-sdk`](https://github.com/GladysAssistant/integration-sdk-js).
 
-User documentation: [`docs/fr.md`](docs/fr.md) / [`docs/en.md`](docs/en.md).
+User documentation: [`docs/fr.md`](docs/fr.md) / [`docs/en.md`](docs/en.md) /
+[`docs/de.md`](docs/de.md) / [`docs/es.md`](docs/es.md).
 
 ## How it works
 
@@ -67,9 +68,9 @@ Requires **Gladys 5.1.0 or later** (scene and widget capability fields).
 │  ├─ store.js                 # small persisted state in /data
 │  ├─ scenes.js                # scene actions
 │  ├─ widgets.js               # dashboard widgets
-│  ├─ status.js                # bilingual messages
+│  ├─ status.js                # en/fr/de/es messages
 │  └─ config.js                # config defaults + normalization
-├─ docs/fr.md, docs/en.md      # user documentation (re-hosted by Gladys)
+├─ docs/{fr,en,de,es}.md       # user documentation (re-hosted by Gladys)
 ├─ test/                       # node --test, no network
 ├─ gladys-assistant-integration.json
 ├─ Dockerfile                  # Node 24 Alpine, read-only rootfs ready
