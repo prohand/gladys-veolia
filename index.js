@@ -85,7 +85,7 @@ gladys.onAction('check_town', async (fields) => {
     return {
       en: 'Enter a 5-digit postal code.',
       fr: 'Indiquez un code postal à 5 chiffres.',
-      de: 'Geben Sie eine 5-stellige Postleitzahl ein.',
+      de: 'Gib eine 5-stellige Postleitzahl ein.',
       es: 'Introduzca un código postal de 5 cifras.',
     };
   }
@@ -96,7 +96,7 @@ gladys.onAction('check_town', async (fields) => {
     return {
       en: 'The Veolia town lookup did not answer, try again later.',
       fr: 'La recherche de commune Veolia n’a pas répondu, réessayez plus tard.',
-      de: 'Die Veolia-Gemeindesuche hat nicht geantwortet, versuchen Sie es später erneut.',
+      de: 'Die Veolia-Gemeindesuche hat nicht geantwortet, versuche es später erneut.',
       es: 'La búsqueda de municipios de Veolia no ha respondido, inténtelo de nuevo más tarde.',
     };
   }
@@ -146,7 +146,7 @@ gladys.on('connected', async () => {
       .setConnectionStatus(false, {
         en: 'Initialization failed, check the integration logs.',
         fr: "L'initialisation a échoué, consultez les logs de l'intégration.",
-        de: 'Die Initialisierung ist fehlgeschlagen, prüfen Sie die Protokolle der Integration.',
+        de: 'Die Initialisierung ist fehlgeschlagen, prüfe die Protokolle der Integration.',
         es: 'La inicialización ha fallado, consulte los registros de la integración.',
       })
       .catch(() => {});

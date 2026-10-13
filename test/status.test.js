@@ -82,7 +82,7 @@ test('every message is in English, French, German and Spanish', () => {
     { name: 'D', type: 'AUTRE', redirect: null },
   ]);
   assertAllLanguages(message, 'townCheckResult');
-  assert.match(message.de, /Unterstützt, wählen Sie das Portal „Eau de Toulouse Métropole“: B\./);
+  assert.match(message.de, /Unterstützt, wähle das Portal „Eau de Toulouse Métropole“: B\./);
   assert.match(message.es, /No abastecido por Veolia: D\./);
 });
 

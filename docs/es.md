@@ -29,7 +29,7 @@ responde «Compatible, portal eau.veolia.fr».
      lanza el activador _Consumo de agua alto_;
    - **Lectura ausente tras** (3 días por defecto): plazo antes del activador
      _Lectura de agua atrasada_.
-5. Guarde y pulse **Probar la conexión**: la respuesta muestra su contador y su
+5. Pulse **Guardar configuración** y luego **Probar la conexión**: la respuesta muestra su contador y su
    última lectura.
 6. Abra la pestaña **Descubrir** y añada el contador de agua con **Añadir a
    Gladys**.
@@ -64,7 +64,7 @@ normal no ver el consumo de ayer.
 
 ## Panel
 
-Añada el widget **Consumo de agua**: último día, mes, año, índice, un gráfico
+Añada el widget **Consumo de agua** (**Panel → Editar → Nuevo widget**): último día, mes, año, índice, un gráfico
 diario (7, 14 o 30 días, a elegir en el widget), la fecha y la fiabilidad de la
 última lectura (medida o estimada) y un botón **Actualizar**. Con varios
 contadores, elija uno en los ajustes del widget.
@@ -77,7 +77,8 @@ conservado el historial.
 
 ## Escenas
 
-La integración añade sus tarjetas al editor de escenas, en **Integraciones**.
+La integración añade sus tarjetas al editor de escenas, en **Integraciones**
+(**Activador de integración** y **Acción de integración**).
 
 Activadores:
 

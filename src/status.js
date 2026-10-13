@@ -26,13 +26,13 @@ export const MESSAGES = {
   notConfigured: {
     en: 'Enter the e-mail and password of your Veolia customer account.',
     fr: 'Indiquez l’e-mail et le mot de passe de votre espace client Veolia.',
-    de: 'Geben Sie die E-Mail-Adresse und das Passwort Ihres Veolia-Kundenkontos ein.',
+    de: 'Gib die E-Mail-Adresse und das Passwort deines Veolia-Kundenkontos ein.',
     es: 'Introduzca el e-mail y la contraseña de su área de cliente de Veolia.',
   },
   authFailed: {
     en: 'Veolia refused the e-mail or the password. Check them by signing in on the Veolia website.',
     fr: 'Veolia a refusé l’e-mail ou le mot de passe. Vérifiez-les en vous connectant sur le site Veolia.',
-    de: 'Veolia hat die E-Mail-Adresse oder das Passwort abgelehnt. Prüfen Sie sie, indem Sie sich auf der Veolia-Website anmelden.',
+    de: 'Veolia hat die E-Mail-Adresse oder das Passwort abgelehnt. Prüfe sie, indem du dich auf der Veolia-Website anmeldest.',
     es: 'Veolia ha rechazado el e-mail o la contraseña. Compruébelos iniciando sesión en la web de Veolia.',
   },
   noSubscription: {
@@ -138,7 +138,7 @@ export function townCheckResult(postalCode, towns) {
     parts.push({
       en: `Supported, choose the portal "${label.en}": ${list}.`,
       fr: `Compatible, choisissez le portail « ${label.fr} » : ${list}.`,
-      de: `Unterstützt, wählen Sie das Portal „${label.de ?? label.en}“: ${list}.`,
+      de: `Unterstützt, wähle das Portal „${label.de ?? label.en}“: ${list}.`,
       es: `Compatible, elija el portal «${label.es ?? label.en}»: ${list}.`,
     });
   }

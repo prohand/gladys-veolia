@@ -12,7 +12,7 @@ dashboard widget, and cards for your scenes.
   Veolia website shows your consumption day by day.
 - Gladys **5.1 or later**.
 
-Is your town served by Veolia? In the Configuration screen, use the **Check my
+Is your town served by Veolia? In the **Configuration** tab, use the **Check my
 town** button with your postal code. For example, Metz (57000) answers
 "Supported, portal eau.veolia.fr".
 
@@ -29,9 +29,9 @@ town** button with your postal code. For example, Metz (57000) answers
      _High water consumption_ trigger fires;
    - **Missing reading after** (3 days by default): delay before the _Water
      reading overdue_ trigger.
-5. Save, then click **Test the connection**: the answer shows your meter and
+5. Click **Save configuration**, then **Test the connection**: the answer shows your meter and
    its last reading.
-6. Open the **Discovery** tab and add the water meter.
+6. Open the **Discover** tab and add the water meter with **Add to Gladys**.
 
 When the device is added, the known history (the current and the previous
 month) is sent to Gladys, **dated on each reading day**.
@@ -40,7 +40,7 @@ Then the integration fetches the **24 previous months** from Veolia, dated on
 their day too, so the Gladys charts can show the past years. The import runs
 in the background, one month every 20 seconds (about 8 minutes). There is no
 file to provide: Veolia keeps the history. If Gladys deletes old states (the
-history retention setting in **Settings → System**), pick at least 2 years to
+**Keep Device State History** setting in **Settings → System**), pick at least 2 years to
 keep them.
 
 ## The "Water meter" device
@@ -62,7 +62,7 @@ yesterday's consumption is normal.
 
 ## Dashboard
 
-Add the **Water consumption** widget: last day, month, year, index, a daily
+Add the **Water consumption** widget (**Dashboard → Edit → New widget**): last day, month, year, index, a daily
 chart (7, 14 or 30 days, set in the widget), the date and reliability of the
 last reading (measured or estimated), and a **Refresh** button. With several
 meters, pick one in the widget settings.
@@ -74,7 +74,8 @@ come straight from Veolia: it works even if Gladys did not keep the history.
 
 ## Scenes
 
-The integration adds its cards to the scene editor, under **Integrations**.
+The integration adds its cards to the scene editor, under **Integrations**
+(**Integration trigger** and **Integration action**).
 
 Triggers:
 

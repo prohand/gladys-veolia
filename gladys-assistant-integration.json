@@ -5,7 +5,7 @@
   "description": {
     "en": "Your water consumption from your Veolia customer account (eau.veolia.fr).",
     "fr": "Votre consommation d'eau depuis votre espace client Veolia (eau.veolia.fr).",
-    "de": "Ihr Wasserverbrauch aus Ihrem Veolia-Kundenkonto (eau.veolia.fr).",
+    "de": "Dein Wasserverbrauch aus deinem Veolia-Kundenkonto (eau.veolia.fr).",
     "es": "Su consumo de agua desde su área de cliente de Veolia (eau.veolia.fr)."
   },
   "version": "1.0.3",
@@ -27,7 +27,7 @@
       "description": {
         "en": "Your home needs a remote-read water meter (télérelève) and a Veolia customer account. Enter the e-mail and password you use on the Veolia website. Not sure your town is served by Veolia? Use the \"Check my town\" button below.",
         "fr": "Votre logement doit avoir un compteur d'eau télérelevé et un espace client Veolia. Indiquez l'e-mail et le mot de passe utilisés sur le site Veolia. Un doute sur votre commune ? Utilisez le bouton « Vérifier ma commune » ci-dessous.",
-        "de": "Ihr Zuhause braucht einen fernablesbaren Wasserzähler (télérelève) und ein Veolia-Kundenkonto. Geben Sie die E-Mail-Adresse und das Passwort ein, die Sie auf der Veolia-Website verwenden. Sie sind nicht sicher, ob Ihre Gemeinde von Veolia versorgt wird? Nutzen Sie unten die Schaltfläche „Meine Gemeinde prüfen“.",
+        "de": "Dein Zuhause braucht einen fernablesbaren Wasserzähler (télérelève) und ein Veolia-Kundenkonto. Gib die E-Mail-Adresse und das Passwort ein, die du auf der Veolia-Website verwendest. Du bist nicht sicher, ob deine Gemeinde von Veolia versorgt wird? Nutze unten die Schaltfläche „Meine Gemeinde prüfen“.",
         "es": "Su vivienda necesita un contador de agua con telelectura (télérelève) y un área de cliente de Veolia. Introduzca el e-mail y la contraseña que usa en la web de Veolia. ¿No sabe si Veolia abastece su municipio? Use el botón «Comprobar mi municipio» de abajo."
       },
       "links": [
@@ -63,7 +63,7 @@
       "description": {
         "en": "The e-mail address of your Veolia customer account.",
         "fr": "L'adresse e-mail de votre espace client Veolia.",
-        "de": "Die E-Mail-Adresse Ihres Veolia-Kundenkontos.",
+        "de": "Die E-Mail-Adresse deines Veolia-Kundenkontos.",
         "es": "La dirección de e-mail de su área de cliente de Veolia."
       },
       "placeholder": {
@@ -97,7 +97,7 @@
       "description": {
         "en": "Keep eau.veolia.fr unless your town redirects you to its own Veolia portal.",
         "fr": "Gardez eau.veolia.fr sauf si votre commune vous redirige vers son propre portail Veolia.",
-        "de": "Behalten Sie eau.veolia.fr, außer Ihre Gemeinde leitet Sie auf ein eigenes Veolia-Portal weiter.",
+        "de": "Behalte eau.veolia.fr, außer deine Gemeinde leitet dich auf ein eigenes Veolia-Portal weiter.",
         "es": "Deje eau.veolia.fr salvo que su municipio le redirija a su propio portal de Veolia."
       },
       "required": false,
