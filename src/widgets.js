@@ -23,9 +23,18 @@ export const CHART_DAYS = [7, 14, 30];
 export const DEFAULT_CHART_DAYS = 14;
 
 const RELIABILITY = {
-  measured: { value: { en: 'Measured', fr: 'Mesurée' }, color: WIDGET_COLORS.SUCCESS },
-  estimated: { value: { en: 'Estimated', fr: 'Estimée' }, color: WIDGET_COLORS.WARNING },
-  unknown: { value: { en: 'Unknown', fr: 'Inconnue' }, color: WIDGET_COLORS.NEUTRAL },
+  measured: {
+    value: { en: 'Measured', fr: 'Mesurée', de: 'Gemessen', es: 'Medida' },
+    color: WIDGET_COLORS.SUCCESS,
+  },
+  estimated: {
+    value: { en: 'Estimated', fr: 'Estimée', de: 'Geschätzt', es: 'Estimada' },
+    color: WIDGET_COLORS.WARNING,
+  },
+  unknown: {
+    value: { en: 'Unknown', fr: 'Inconnue', de: 'Unbekannt', es: 'Desconocida' },
+    color: WIDGET_COLORS.NEUTRAL,
+  },
 };
 
 // A tile value is a number or a string of at most 12 characters.
@@ -34,12 +43,20 @@ const m3 = (value) => (value === null ? '–' : Math.round(value * 100) / 100);
 function readingAge(days, overdueDays) {
   if (days === 0 || days === 1) {
     return {
-      value: days === 0 ? { en: 'today', fr: "aujourd'hui" } : { en: 'yesterday', fr: 'hier' },
+      value:
+        days === 0
+          ? { en: 'today', fr: "aujourd'hui", de: 'heute', es: 'hoy' }
+          : { en: 'yesterday', fr: 'hier', de: 'gestern', es: 'ayer' },
       color: WIDGET_COLORS.SUCCESS,
     };
   }
   return {
-    value: { en: `${days} days ago`, fr: `il y a ${days} jours` },
+    value: {
+      en: `${days} days ago`,
+      fr: `il y a ${days} jours`,
+      de: `vor ${days} Tagen`,
+      es: `hace ${days} días`,
+    },
     color: days >= overdueDays ? WIDGET_COLORS.WARNING : WIDGET_COLORS.SUCCESS,
   };
 }
@@ -54,6 +71,8 @@ function emptyContent(sync) {
         text: message ?? {
           en: 'No reading yet: the first refresh is running.',
           fr: 'Aucun relevé pour l’instant : premier rafraîchissement en cours.',
+          de: 'Noch kein Messwert: Die erste Aktualisierung läuft.',
+          es: 'Todavía no hay ninguna lectura: la primera actualización está en curso.',
         },
       },
       refreshButton(),
@@ -64,7 +83,7 @@ function emptyContent(sync) {
 function refreshButton() {
   return {
     type: 'button',
-    label: { en: 'Refresh', fr: 'Rafraîchir' },
+    label: { en: 'Refresh', fr: 'Rafraîchir', de: 'Aktualisieren', es: 'Actualizar' },
     icon: 'refresh-cw',
     style: 'secondary',
     action: { key: WIDGET_ACTIONS.REFRESH },
@@ -84,22 +103,32 @@ export function buildWidgetContent(sync, settings = {}) {
   const status = [];
   if (last) {
     status.push({
-      label: { en: `Last reading (${last.date})`, fr: `Dernier relevé (${last.date})` },
+      label: {
+        en: `Last reading (${last.date})`,
+        fr: `Dernier relevé (${last.date})`,
+        de: `Letzter Messwert (${last.date})`,
+        es: `Última lectura (${last.date})`,
+      },
       icon: 'calendar',
       ...readingAge(summary.daysSinceReading, sync.config.overdue_days),
     });
     status.push({
-      label: { en: 'Reliability', fr: 'Fiabilité' },
+      label: { en: 'Reliability', fr: 'Fiabilité', de: 'Zuverlässigkeit', es: 'Fiabilidad' },
       icon: 'check-circle',
       ...RELIABILITY[reliabilityOf(last.reliability)],
     });
   }
   status.push({
-    label: { en: 'Veolia portal', fr: 'Portail Veolia' },
+    label: {
+      en: 'Veolia portal',
+      fr: 'Portail Veolia',
+      de: 'Veolia-Portal',
+      es: 'Portal de Veolia',
+    },
     icon: 'cloud',
     value: sync.status.connected
-      ? { en: 'Connected', fr: 'Connecté' }
-      : { en: 'Error', fr: 'Erreur' },
+      ? { en: 'Connected', fr: 'Connecté', de: 'Verbunden', es: 'Conectado' }
+      : { en: 'Error', fr: 'Erreur', de: 'Fehler', es: 'Error' },
     color: sync.status.connected ? WIDGET_COLORS.SUCCESS : WIDGET_COLORS.DANGER,
   });
 
@@ -107,11 +136,16 @@ export function buildWidgetContent(sync, settings = {}) {
     {
       type: 'text',
       variant: 'caption',
-      text: { en: `Meter ${subscription.meter}`, fr: `Compteur ${subscription.meter}` },
+      text: {
+        en: `Meter ${subscription.meter}`,
+        fr: `Compteur ${subscription.meter}`,
+        de: `Zähler ${subscription.meter}`,
+        es: `Contador ${subscription.meter}`,
+      },
     },
     {
       type: 'value',
-      label: { en: 'Last day', fr: 'Dernier jour' },
+      label: { en: 'Last day', fr: 'Dernier jour', de: 'Letzter Tag', es: 'Último día' },
       icon: 'droplet',
       value: last ? last.liters : '–',
       unit: 'L',
@@ -119,21 +153,21 @@ export function buildWidgetContent(sync, settings = {}) {
     },
     {
       type: 'value',
-      label: { en: 'This month', fr: 'Ce mois-ci' },
+      label: { en: 'This month', fr: 'Ce mois-ci', de: 'Dieser Monat', es: 'Este mes' },
       icon: 'calendar',
       value: m3(summary.currentMonthM3),
       unit: 'm³',
     },
     {
       type: 'value',
-      label: { en: 'This year', fr: 'Cette année' },
+      label: { en: 'This year', fr: 'Cette année', de: 'Dieses Jahr', es: 'Este año' },
       icon: 'bar-chart-2',
       value: m3(summary.currentYearM3),
       unit: 'm³',
     },
     {
       type: 'value',
-      label: { en: 'Index', fr: 'Index' },
+      label: { en: 'Index', fr: 'Index', de: 'Zählerstand', es: 'Índice' },
       icon: 'hash',
       value: m3(summary.indexM3),
       unit: 'm³',
@@ -144,9 +178,19 @@ export function buildWidgetContent(sync, settings = {}) {
     components.push({
       type: 'chart',
       chart_type: 'bar',
-      title: { en: `Last ${days} days`, fr: `${days} derniers jours` },
+      title: {
+        en: `Last ${days} days`,
+        fr: `${days} derniers jours`,
+        de: `Letzte ${days} Tage`,
+        es: `Últimos ${days} días`,
+      },
       unit: 'L',
-      series: [{ name: { en: 'Consumption', fr: 'Consommation' }, points }],
+      series: [
+        {
+          name: { en: 'Consumption', fr: 'Consommation', de: 'Verbrauch', es: 'Consumo' },
+          points,
+        },
+      ],
     });
   }
   components.push({ type: 'status', items: status }, refreshButton());
@@ -175,6 +219,8 @@ export function buildComparisonContent(sync, settings = {}) {
       text: {
         en: `Meter ${meter.subscription.meter}, per month`,
         fr: `Compteur ${meter.subscription.meter}, par mois`,
+        de: `Zähler ${meter.subscription.meter}, pro Monat`,
+        es: `Contador ${meter.subscription.meter}, por mes`,
       },
     },
   ];
@@ -183,7 +229,12 @@ export function buildComparisonContent(sync, settings = {}) {
     components.push({
       type: 'value',
       label: inProgress
-        ? { en: `${entry.year} so far`, fr: `${entry.year} à ce jour` }
+        ? {
+            en: `${entry.year} so far`,
+            fr: `${entry.year} à ce jour`,
+            de: `${entry.year} bisher`,
+            es: `${entry.year} hasta hoy`,
+          }
         : String(entry.year),
       icon: 'calendar',
       value: m3(entry.total),
@@ -196,7 +247,12 @@ export function buildComparisonContent(sync, settings = {}) {
     // Same months on both sides: January to the last full month.
     components.push({
       type: 'value',
-      label: { en: `vs ${before.year}`, fr: `vs ${before.year}` },
+      label: {
+        en: `vs ${before.year}`,
+        fr: `vs ${before.year}`,
+        de: `vs. ${before.year}`,
+        es: `vs. ${before.year}`,
+      },
       icon: 'trending-up',
       value: change(current.samePeriod, before.samePeriod),
       color: current.samePeriod > before.samePeriod ? WIDGET_COLORS.WARNING : WIDGET_COLORS.SUCCESS,
@@ -216,7 +272,12 @@ export function buildComparisonContent(sync, settings = {}) {
     components.push({
       type: 'chart',
       chart_type: 'bar',
-      title: { en: 'Monthly consumption', fr: 'Consommation par mois' },
+      title: {
+        en: 'Monthly consumption',
+        fr: 'Consommation par mois',
+        de: 'Monatlicher Verbrauch',
+        es: 'Consumo mensual',
+      },
       unit: 'm³',
       series,
     });
@@ -226,6 +287,8 @@ export function buildComparisonContent(sync, settings = {}) {
       text: {
         en: 'Veolia has no monthly total for this meter yet.',
         fr: 'Veolia n’a pas encore de total mensuel pour ce compteur.',
+        de: 'Veolia hat für diesen Zähler noch keine Monatssumme.',
+        es: 'Veolia todavía no tiene un total mensual para este contador.',
       },
     });
   }
@@ -241,7 +304,12 @@ async function refreshAction(key, sync, { actionKey }) {
   }
   const result = await sync.refresh();
   if (result.ok) {
-    return { en: 'Consumption refreshed.', fr: 'Consommation rafraîchie.' };
+    return {
+      en: 'Consumption refreshed.',
+      fr: 'Consommation rafraîchie.',
+      de: 'Verbrauch aktualisiert.',
+      es: 'Consumo actualizado.',
+    };
   }
   // Toasts are capped at 200 characters: the detail is in the status.
   return result.message === MESSAGES.notConfigured
@@ -249,6 +317,8 @@ async function refreshAction(key, sync, { actionKey }) {
     : {
         en: 'Refresh failed: see the integration status.',
         fr: 'Échec du rafraîchissement : voir le statut de l’intégration.',
+        de: 'Aktualisierung fehlgeschlagen: siehe Status der Integration.',
+        es: 'Error al actualizar: consulte el estado de la integración.',
       };
 }
 

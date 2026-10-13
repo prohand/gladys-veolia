@@ -143,7 +143,26 @@ test('the catalog description holds 10 to 100 characters per language', () => {
   }
 });
 
-test('every text is bilingual, placeholders included', () => {
+const LANGUAGES = ['en', 'fr', 'de', 'es'];
+
+// Every multi-language object of the manifest, wherever it sits (labels,
+// descriptions, placeholders, option and link labels...), with its path.
+function multiLanguageTexts(node, path = 'manifest', found = []) {
+  if (Array.isArray(node)) {
+    node.forEach((child, i) => multiLanguageTexts(child, `${path}[${i}]`, found));
+  } else if (node && typeof node === 'object') {
+    if (typeof node.en === 'string') {
+      found.push({ path, text: node });
+    } else {
+      for (const [key, child] of Object.entries(node)) {
+        multiLanguageTexts(child, `${path}.${key}`, found);
+      }
+    }
+  }
+  return found;
+}
+
+test('every text is in English, French, German and Spanish, placeholders included', () => {
   const items = [
     ...allFields,
     ...(manifest.actions ?? []),
@@ -155,8 +174,33 @@ test('every text is bilingual, placeholders included', () => {
     for (const key of ['label', 'description', 'placeholder']) {
       if (item[key] !== undefined) {
         assert.equal(typeof item[key], 'object', `"${item.key}": ${key}`);
-        assert.ok(item[key].en && item[key].fr, `"${item.key}": ${key} needs en + fr`);
       }
     }
+  }
+  const texts = multiLanguageTexts(manifest);
+  assert.ok(texts.length > 50, 'the walk found the texts');
+  for (const { path, text } of texts) {
+    assert.deepEqual(Object.keys(text).sort(), [...LANGUAGES].sort(), `${path} languages`);
+    for (const lang of LANGUAGES) {
+      assert.ok(text[lang].trim().length > 0, `${path}.${lang} is empty`);
+    }
+  }
+});
+
+test('texts respect the store length limits in every language', () => {
+  const within = (text, min, max, path) => {
+    for (const [lang, value] of Object.entries(text)) {
+      assert.ok(
+        value.length >= min && value.length <= max,
+        `${path}.${lang} has ${value.length} characters (${min} to ${max} allowed)`,
+      );
+    }
+  };
+  for (const widget of manifest.widgets) {
+    within(widget.label, 3, 30, `widgets.${widget.key}.label`);
+    within(widget.description, 0, 100, `widgets.${widget.key}.description`);
+  }
+  for (const section of manifest.config_schema.filter((f) => f.type === 'section')) {
+    within(section.description, 0, 1000, `config_schema.${section.key}.description`);
   }
 });

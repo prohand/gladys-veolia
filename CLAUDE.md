@@ -112,7 +112,7 @@ connection lifecycle — and holds no Veolia logic.
 `test/manifest.test.js`:
 
 - free text is `string`, the password is `secret`;
-- `label`, `description` and `placeholder` are `{ en, fr }` objects, never bare strings;
+- `label`, `description` and `placeholder` are `{ en, fr, de, es }` objects, never bare strings;
 - the catalog `description` holds 10 to 100 characters per language;
 - `scene_triggers`, `scene_actions`, `widgets` require `gladys_version` `>=5.1.0`;
 - `transports` is `["cloud"]`;
@@ -136,8 +136,8 @@ Every user-visible change adds a line under `## [Unreleased]` (`### Added`, `Cha
 
 Comments explain **why**, in English. Keep `src/veolia/consumption.js` and `src/meter.js` pure
 (no network, no SDK calls). Feature names are French (the users are French Veolia customers);
-every user-facing message (status, action answer, toast, manifest texts, docs) is an `en`/`fr`
-pair, and `docs/en.md` / `docs/fr.md` stay in sync.
+every user-facing message (status, action answer, toast, manifest texts, docs) is
+`{ en, fr, de, es }`, and `docs/en.md`, `docs/fr.md`, `docs/de.md`, `docs/es.md` stay in sync.
 
 **Security**: the password only goes to Cognito, in a POST body; never log it, never put it in a
 URL, never store it outside the Gladys configuration. Logs may contain the PDS and the meter

@@ -1,23 +1,45 @@
 // -----------------------------------------------------------------------------
 // User-facing messages: the connection status of the Configuration screen and
-// the answers of the manifest actions. Bilingual, like every text the user
-// reads. Never echo the password, nor the full e-mail address.
+// the answers of the manifest actions. Multi-language, like every text the
+// user reads, in every language Gladys offers (`LANGUAGES`). Never echo the
+// password, nor the full e-mail address.
 // -----------------------------------------------------------------------------
 
 import { PORTALS } from './veolia/portals.js';
+
+/** The languages of the Gladys UI: every user-facing text carries all of them. */
+export const LANGUAGES = ['en', 'fr', 'de', 'es'];
+
+/**
+ * Join multi-language texts language by language; a missing language falls
+ * back to English, as the Gladys front does.
+ * @param {Array<Record<string, string>>} texts
+ * @param {string} separator
+ */
+export function joinTexts(texts, separator) {
+  return Object.fromEntries(
+    LANGUAGES.map((lang) => [lang, texts.map((t) => t[lang] ?? t.en).join(separator)]),
+  );
+}
 
 export const MESSAGES = {
   notConfigured: {
     en: 'Enter the e-mail and password of your Veolia customer account.',
     fr: 'Indiquez l’e-mail et le mot de passe de votre espace client Veolia.',
+    de: 'Geben Sie die E-Mail-Adresse und das Passwort Ihres Veolia-Kundenkontos ein.',
+    es: 'Introduzca el e-mail y la contraseña de su área de cliente de Veolia.',
   },
   authFailed: {
     en: 'Veolia refused the e-mail or the password. Check them by signing in on the Veolia website.',
     fr: 'Veolia a refusé l’e-mail ou le mot de passe. Vérifiez-les en vous connectant sur le site Veolia.',
+    de: 'Veolia hat die E-Mail-Adresse oder das Passwort abgelehnt. Prüfen Sie sie, indem Sie sich auf der Veolia-Website anmelden.',
+    es: 'Veolia ha rechazado el e-mail o la contraseña. Compruébelos iniciando sesión en la web de Veolia.',
   },
   noSubscription: {
     en: 'Signed in, but the account has no active water subscription.',
     fr: 'Connecté, mais le compte n’a aucun abonnement eau actif.',
+    de: 'Angemeldet, aber das Konto hat kein aktives Wasserabonnement.',
+    es: 'Sesión iniciada, pero la cuenta no tiene ningún contrato de agua activo.',
   },
 };
 
@@ -25,6 +47,8 @@ export function unreachable(detail) {
   return {
     en: `Cannot read the Veolia portal (${detail}). Next try at the next refresh.`,
     fr: `Impossible de lire le portail Veolia (${detail}). Nouvel essai au prochain rafraîchissement.`,
+    de: `Das Veolia-Portal kann nicht gelesen werden (${detail}). Neuer Versuch bei der nächsten Aktualisierung.`,
+    es: `No se puede leer el portal de Veolia (${detail}). Nuevo intento en la próxima actualización.`,
   };
 }
 
@@ -32,6 +56,8 @@ export function gladysFailed(detail) {
   return {
     en: `Veolia data read, but Gladys refused it (${detail}). Next try at the next refresh.`,
     fr: `Données Veolia lues, mais Gladys les a refusées (${detail}). Nouvel essai au prochain rafraîchissement.`,
+    de: `Veolia-Daten gelesen, aber Gladys hat sie abgelehnt (${detail}). Neuer Versuch bei der nächsten Aktualisierung.`,
+    es: `Datos de Veolia leídos, pero Gladys los ha rechazado (${detail}). Nuevo intento en la próxima actualización.`,
   };
 }
 
@@ -43,18 +69,22 @@ export function testResult(meters) {
       return {
         en: `Meter ${subscription.meter}: no reading yet.`,
         fr: `Compteur ${subscription.meter} : aucun relevé pour l’instant.`,
+        de: `Zähler ${subscription.meter}: noch kein Messwert.`,
+        es: `Contador ${subscription.meter}: todavía no hay ninguna lectura.`,
       };
     }
     const index = summary.indexM3 === null ? '' : `, index ${summary.indexM3} m³`;
     return {
       en: `Meter ${subscription.meter}: ${last.liters} L on ${last.date}${index}.`,
       fr: `Compteur ${subscription.meter} : ${last.liters} L le ${last.date}${index}.`,
+      de: `Zähler ${subscription.meter}: ${last.liters} L am ${last.date}${index}.`,
+      es: `Contador ${subscription.meter}: ${last.liters} L el ${last.date}${index}.`,
     };
   });
-  return {
-    en: `Connected. ${lines.map((l) => l.en).join(' ')}`,
-    fr: `Connecté. ${lines.map((l) => l.fr).join(' ')}`,
-  };
+  return joinTexts(
+    [{ en: 'Connected.', fr: 'Connecté.', de: 'Verbunden.', es: 'Conectado.' }, ...lines],
+    ' ',
+  );
 }
 
 const MAX_TOWNS = 8;
@@ -75,6 +105,8 @@ export function townCheckResult(postalCode, towns) {
     return {
       en: `No town found for ${postalCode}.`,
       fr: `Aucune commune trouvée pour ${postalCode}.`,
+      de: `Keine Gemeinde für ${postalCode} gefunden.`,
+      es: `No se ha encontrado ningún municipio para ${postalCode}.`,
     };
   }
   const national = towns.filter((t) => t.type === 'NON_REDIRIGE');
@@ -90,24 +122,43 @@ export function townCheckResult(postalCode, towns) {
   const unsupported = redirected.filter((t) => !supportedPortal(t));
   const notServed = towns.filter((t) => t.type !== 'NON_REDIRIGE' && t.type !== 'REDIRIGE');
 
-  const en = [];
-  const fr = [];
+  const parts = [];
   if (national.length > 0) {
-    en.push(`Supported, portal eau.veolia.fr: ${listTowns(national)}.`);
-    fr.push(`Compatible, portail eau.veolia.fr : ${listTowns(national)}.`);
+    const list = listTowns(national);
+    parts.push({
+      en: `Supported, portal eau.veolia.fr: ${list}.`,
+      fr: `Compatible, portail eau.veolia.fr : ${list}.`,
+      de: `Unterstützt, Portal eau.veolia.fr: ${list}.`,
+      es: `Compatible, portal eau.veolia.fr: ${list}.`,
+    });
   }
   for (const host of new Set(ownPortal.map(supportedPortal))) {
     const list = listTowns(ownPortal.filter((t) => supportedPortal(t) === host));
-    en.push(`Supported, choose the portal "${PORTALS[host].label.en}": ${list}.`);
-    fr.push(`Compatible, choisissez le portail « ${PORTALS[host].label.fr} » : ${list}.`);
+    const { label } = PORTALS[host];
+    parts.push({
+      en: `Supported, choose the portal "${label.en}": ${list}.`,
+      fr: `Compatible, choisissez le portail « ${label.fr} » : ${list}.`,
+      de: `Unterstützt, wählen Sie das Portal „${label.de ?? label.en}“: ${list}.`,
+      es: `Compatible, elija el portal «${label.es ?? label.en}»: ${list}.`,
+    });
   }
   if (unsupported.length > 0) {
-    en.push(`Veolia portal not supported yet: ${listTowns(unsupported)}.`);
-    fr.push(`Portail Veolia pas encore pris en charge : ${listTowns(unsupported)}.`);
+    const list = listTowns(unsupported);
+    parts.push({
+      en: `Veolia portal not supported yet: ${list}.`,
+      fr: `Portail Veolia pas encore pris en charge : ${list}.`,
+      de: `Veolia-Portal noch nicht unterstützt: ${list}.`,
+      es: `Portal de Veolia todavía no compatible: ${list}.`,
+    });
   }
   if (notServed.length > 0) {
-    en.push(`Not served by Veolia: ${listTowns(notServed)}.`);
-    fr.push(`Non desservie par Veolia : ${listTowns(notServed)}.`);
+    const list = listTowns(notServed);
+    parts.push({
+      en: `Not served by Veolia: ${list}.`,
+      fr: `Non desservie par Veolia : ${list}.`,
+      de: `Nicht von Veolia versorgt: ${list}.`,
+      es: `No abastecido por Veolia: ${list}.`,
+    });
   }
-  return { en: en.join(' '), fr: fr.join(' ') };
+  return joinTexts(parts, ' ');
 }

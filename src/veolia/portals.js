@@ -17,11 +17,21 @@ export const DEFAULT_PORTAL = 'eau.veolia.fr';
 export const PORTALS = {
   'eau.veolia.fr': {
     clientId: '3kghade1fg54739kj8pkbova8j',
-    label: { en: 'Veolia (eau.veolia.fr)', fr: 'Veolia (eau.veolia.fr)' },
+    label: {
+      en: 'Veolia (eau.veolia.fr)',
+      fr: 'Veolia (eau.veolia.fr)',
+      de: 'Veolia (eau.veolia.fr)',
+      es: 'Veolia (eau.veolia.fr)',
+    },
   },
   'eaudetm.monespace.eau.veolia.fr': {
     clientId: '19bjc8ldefie683n889iiubjc8',
-    label: { en: 'Eau de Toulouse Métropole', fr: 'Eau de Toulouse Métropole' },
+    label: {
+      en: 'Eau de Toulouse Métropole',
+      fr: 'Eau de Toulouse Métropole',
+      de: 'Eau de Toulouse Métropole',
+      es: 'Eau de Toulouse Métropole',
+    },
   },
 };
 

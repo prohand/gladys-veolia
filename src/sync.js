@@ -443,6 +443,8 @@ export class VeoliaSync {
           message: {
             en: `Veolia answers, but no new reading for ${days} days.`,
             fr: `Veolia répond, mais aucun nouveau relevé depuis ${days} jours.`,
+            de: `Veolia antwortet, aber seit ${days} Tagen kein neuer Messwert.`,
+            es: `Veolia responde, pero no hay ninguna lectura nueva desde hace ${days} días.`,
           },
         };
       }

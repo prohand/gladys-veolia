@@ -1,6 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { testResult, townCheckResult } from '../src/status.js';
+import {
+  MESSAGES,
+  gladysFailed,
+  joinTexts,
+  testResult,
+  townCheckResult,
+  unreachable,
+} from '../src/status.js';
+import { assertAllLanguages } from './helpers/languages.js';
 
 test('Metz is on the national portal', () => {
   const message = townCheckResult('57000', [
@@ -56,4 +64,33 @@ test('testResult describes each meter', () => {
     message.fr,
     'Connecté. Compteur M1 : 120 L le 2026-10-08, index 400.5 m³. Compteur M2 : aucun relevé pour l’instant.',
   );
+});
+
+test('every message is in English, French, German and Spanish', () => {
+  assertAllLanguages(MESSAGES, 'MESSAGES');
+  assertAllLanguages(unreachable('timeout'), 'unreachable');
+  assertAllLanguages(gladysFailed('429'), 'gladysFailed');
+  assertAllLanguages(
+    testResult([{ subscription: { meter: 'M1' }, summary: { lastReading: null, indexM3: null } }]),
+    'testResult',
+  );
+  assertAllLanguages(townCheckResult('00000', []), 'townCheckResult (none)');
+  const message = townCheckResult('31000', [
+    { name: 'A', type: 'NON_REDIRIGE', redirect: null },
+    { name: 'B', type: 'REDIRIGE', redirect: 'https://eaudetm.monespace.eau.veolia.fr' },
+    { name: 'C', type: 'REDIRIGE', redirect: 'https://other.example.fr' },
+    { name: 'D', type: 'AUTRE', redirect: null },
+  ]);
+  assertAllLanguages(message, 'townCheckResult');
+  assert.match(message.de, /Unterstützt, wählen Sie das Portal „Eau de Toulouse Métropole“: B\./);
+  assert.match(message.es, /No abastecido por Veolia: D\./);
+});
+
+test('joinTexts joins language by language, falling back to English', () => {
+  assert.deepEqual(joinTexts([{ en: 'A', fr: 'B', de: 'C', es: 'D' }, { en: 'E' }], ' '), {
+    en: 'A E',
+    fr: 'B E',
+    de: 'C E',
+    es: 'D E',
+  });
 });
