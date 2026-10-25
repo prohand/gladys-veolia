@@ -10,7 +10,7 @@ widget para el panel y tarjetas para sus escenas.
   Veolia todos los días. Sin él, Veolia solo tiene una lectura al año.
 - Un **área de cliente de Veolia** con un e-mail y una contraseña. Compruebe que
   la web de Veolia muestra su consumo día a día.
-- Gladys **5.1 o posterior**.
+- Gladys **5.3 o posterior**.
 
 ¿Veolia abastece su municipio? En la pestaña **Configuración**, use el botón
 **Comprobar mi municipio** con su código postal. Por ejemplo, Metz (57000)

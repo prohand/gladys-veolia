@@ -114,7 +114,9 @@ connection lifecycle — and holds no Veolia logic.
 - free text is `string`, the password is `secret`;
 - `label`, `description` and `placeholder` are `{ en, fr, de, es }` objects, never bare strings;
 - the catalog `description` holds 10 to 100 characters per language;
-- `scene_triggers`, `scene_actions`, `widgets` require `gladys_version` `>=5.1.0`;
+- `scene_triggers`, `scene_actions`, `widgets` require `gladys_version` `>=5.1.0`, `keywords` and
+  `countries` (`["FR"]`) `>=5.3.0` (the manifest declares `>=5.3.0`);
+- `categories` are 1 to 3 keys of the store vocabulary, keywords 1 to 10 strings of 2 to 30 characters;
 - `transports` is `["cloud"]`;
 - manifest keys and code keys match: `actions` ↔ `gladys.onAction` in `index.js`,
   `scene_actions` ↔ `SCENE_ACTIONS`, `scene_triggers` ↔ `TRIGGERS`, `widgets` ↔ `WIDGETS`,

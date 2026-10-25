@@ -10,7 +10,7 @@ dashboard widget, and cards for your scenes.
   Veolia every day. Without it, Veolia only has one reading a year.
 - A **Veolia customer account** with an e-mail and a password. Check that the
   Veolia website shows your consumption day by day.
-- Gladys **5.1 or later**.
+- Gladys **5.3 or later**.
 
 Is your town served by Veolia? In the **Configuration** tab, use the **Check my
 town** button with your postal code. For example, Metz (57000) answers
