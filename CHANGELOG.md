@@ -6,6 +6,16 @@ All notable changes to this integration are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Store search keywords (water meter, compteur d'eau, télérelève, Eau de Toulouse
+  Métropole…) and the country the integration is offered in (France).
+
+### Changed
+
+- Gladys 5.3.0 or later is now required.
+- Gladys integration SDK 0.16.
+
 ## [1.1.1] - 2026-10-23
 
 - Maintenance release, no functional change.

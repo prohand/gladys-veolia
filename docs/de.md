@@ -10,7 +10,7 @@ Dashboard-Widget und Karten für deine Szenen.
   jeden Tag an Veolia. Ohne ihn hat Veolia nur einen Messwert pro Jahr.
 - Ein **Veolia-Kundenkonto** mit E-Mail-Adresse und Passwort. Prüfe, dass
   die Veolia-Website deinen Verbrauch Tag für Tag anzeigt.
-- Gladys **5.1 oder neuer**.
+- Gladys **5.3 oder neuer**.
 
 Wird deine Gemeinde von Veolia versorgt? Nutze im Tab **Konfiguration** die
 Schaltfläche **Meine Gemeinde prüfen** mit deiner Postleitzahl. Für Metz (57000)

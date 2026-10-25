@@ -10,7 +10,7 @@ d'eau », un widget de tableau de bord, et des cartes pour vos scènes.
   consommation à Veolia. Sans télérelève, Veolia n'a qu'un relevé par an.
 - Un **espace client Veolia** avec e-mail et mot de passe. Vérifiez que vous
   voyez bien votre consommation par jour sur le site Veolia.
-- Gladys **5.1 ou plus récent**.
+- Gladys **5.3 ou plus récent**.
 
 Votre commune est-elle servie par Veolia ? Dans l'écran de configuration,
 utilisez le bouton **Vérifier ma commune** avec votre code postal. Par

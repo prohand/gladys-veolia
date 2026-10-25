@@ -52,7 +52,8 @@ does.
 - **Configuration actions**: _Test the connection_, _Check my town_ (postal
   code → Veolia portal, no account needed).
 
-Requires **Gladys 5.1.0 or later** (scene and widget capability fields).
+Requires **Gladys 5.3.0 or later** (catalog keywords and countries; the scene and widget
+capability fields need 5.1.0).
 
 ## Project structure
 

@@ -76,8 +76,57 @@ test('the capability fields require Gladys >= 5.1.0', () => {
   );
 });
 
-test('catalog categories: 1 to 3', () => {
+// The store vocabulary of catalog shelves (Gladys 5.3 added the last four).
+const CATALOG_CATEGORIES = [
+  'climate',
+  'lighting',
+  'energy',
+  'security',
+  'multimedia',
+  'appliances',
+  'environment',
+  'protocols',
+  'network',
+  'notifications',
+  'assistants',
+  'services',
+  'transport',
+  'vehicles',
+  'servers',
+  'leisure',
+];
+
+test('catalog categories: 1 to 3 unique keys of the store vocabulary', () => {
   assert.ok(manifest.categories.length >= 1 && manifest.categories.length <= 3);
+  assert.equal(new Set(manifest.categories).size, manifest.categories.length);
+  for (const category of manifest.categories) {
+    assert.ok(CATALOG_CATEGORIES.includes(category), `unknown category "${category}"`);
+  }
+});
+
+test('keywords, countries and music require Gladys >= 5.3.0', () => {
+  // An older core rejects any manifest field it does not know.
+  if (manifest.keywords || manifest.countries || manifest.music) {
+    assert.ok(
+      isAtLeast(minGladysVersion(), [5, 3, 0]),
+      `keywords and countries require gladys_version >= 5.3.0, got "${manifest.gladys_version}"`,
+    );
+  }
+});
+
+test('search keywords: 1 to 10 unique strings of 2 to 30 characters', () => {
+  const { keywords } = manifest;
+  assert.ok(Array.isArray(keywords) && keywords.length >= 1 && keywords.length <= 10);
+  const normalized = keywords.map((keyword) => keyword.trim().toLowerCase());
+  assert.equal(new Set(normalized).size, keywords.length, 'keywords must be unique');
+  for (const keyword of normalized) {
+    assert.ok(keyword.length >= 2 && keyword.length <= 30, `keyword "${keyword}"`);
+  }
+});
+
+test('the integration is listed for France only', () => {
+  // The Veolia water portals read here are the French ones.
+  assert.deepEqual(manifest.countries, ['FR']);
 });
 
 test('the manifest declares the cloud transport only', () => {
