@@ -6,6 +6,8 @@ All notable changes to this integration are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-25
+
 ### Added
 
 - Store search keywords (water meter, compteur d'eau, télérelève, Eau de Toulouse
@@ -74,7 +76,8 @@ All notable changes to this integration are documented here. The format follows
   image and runs the store admission checks; Dependabot keeps the npm
   dependencies, the GitHub Actions and the Docker base image up to date.
 
-[Unreleased]: https://github.com/prohand/gladys-veolia/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/prohand/gladys-veolia/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/prohand/gladys-veolia/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/prohand/gladys-veolia/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/prohand/gladys-veolia/compare/v1.0.3...v1.1.0
 [1.0.3]: https://github.com/prohand/gladys-veolia/compare/v1.0.2...v1.0.3
