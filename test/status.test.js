@@ -30,6 +30,18 @@ test('Toulouse is redirected to a supported portal', () => {
   assert.match(message.fr, /Eau de Toulouse Métropole/);
 });
 
+test('La Roche-sur-Yon is redirected to Vendée Eau, outside monespace', () => {
+  // As the town lookup answered on 2026-10-30.
+  const message = townCheckResult('85000', [
+    {
+      name: 'LA ROCHE SUR YON',
+      type: 'REDIRIGE',
+      redirect: 'https://monespace85.eau.veolia.fr?numero_commune=21443&numero_quartier=0',
+    },
+  ]);
+  assert.match(message.fr, /choisissez le portail « Vendée Eau » : LA ROCHE SUR YON\./);
+});
+
 test('unsupported portals and towns not served are told apart', () => {
   const message = townCheckResult('99999', [
     { name: 'A', type: 'REDIRIGE', redirect: 'https://other.example.fr' },

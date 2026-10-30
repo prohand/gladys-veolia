@@ -6,6 +6,12 @@ All notable changes to this integration are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- The delegated Veolia portals: Atlantic'Eau, C Mon O, Calléo, Eau du Coquelicot,
+  Eaux de Dinan, Nantes Métropole, Odici, SMAEP Ouest Briard, Sobass, Valyo and
+  Vendée Eau. "Check my town" names the portal to choose for their towns.
+
 ## [1.2.0] - 2026-10-25
 
 ### Added

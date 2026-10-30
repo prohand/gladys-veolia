@@ -137,6 +137,9 @@ test('the manifest declares the cloud transport only', () => {
 test('select options match the code', () => {
   const portal = fieldOf(manifest.config_schema, 'portal');
   assert.deepEqual(portal.options.map((o) => o.value).sort(), Object.keys(PORTALS).sort());
+  for (const option of portal.options) {
+    assert.deepEqual(option.label, PORTALS[option.value].label, option.value);
+  }
 
   const period = fieldOf(fieldOf(manifest.scene_actions, 'get_consumption').fields, 'period');
   assert.deepEqual(period.options.map((o) => o.value).sort(), Object.values(PERIODS).sort());

@@ -49,8 +49,9 @@ connection lifecycle — and holds no Veolia logic.
   `/abonnements/{id}/facturation` (PDS + start date), `/consommations/{id}/journalieres` and
   `/mensuelles`. Retries network errors, 429 and 5xx (3 attempts); re-signs in once on 401.
   `lookupTowns()` reads the public town picker (no account).
-- **`src/veolia/portals.js`** — portal host → Cognito client id. Mirrors `portals.py` of the
-  Python `veolia-api` library (the Home Assistant integration's client): keep them in sync.
+- **`src/veolia/portals.js`** — portal host → Cognito client id. The ids come from the public web
+  bundle every portal serves (`cognitoUserpool<Portal>ClientId`, next to each production host);
+  the key is the host the town lookup redirects to.
 - **`src/veolia/consumption.js`** — pure: normalizes records, computes totals and periods.
   Dates are French calendar days (`Europe/Paris`).
 - **`src/meter.js`** — subscription → device payload and states.
