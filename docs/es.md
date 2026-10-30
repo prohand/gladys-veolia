@@ -21,7 +21,8 @@ responde «Compatible, portal eau.veolia.fr».
 1. Abra la pestaña **Configuración** de la integración.
 2. Introduzca el **e-mail** y la **contraseña** de su área de cliente.
 3. **Área de cliente**: deje `eau.veolia.fr`, salvo que _Comprobar mi
-   municipio_ indique otro portal (Eau de Toulouse Métropole).
+   municipio_ indique otro portal (Eau de Toulouse Métropole, Vendée Eau,
+   C Mon O, Nantes Métropole…).
 4. Ajustes opcionales:
    - **Intervalo de actualización** (6 h por defecto): Veolia publica una
      lectura al día, un intervalo corto no aporta nada;

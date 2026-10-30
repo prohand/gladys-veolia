@@ -21,7 +21,8 @@ town** button with your postal code. For example, Metz (57000) answers
 1. Open the **Configuration** tab of the integration.
 2. Enter the **e-mail** and **password** of your customer account.
 3. **Customer portal**: keep `eau.veolia.fr`, unless _Check my town_ names
-   another portal (Eau de Toulouse Métropole).
+   another portal (Eau de Toulouse Métropole, Vendée Eau, C Mon O, Nantes
+   Métropole…).
 4. Optional settings:
    - **Refresh interval** (6 h by default): Veolia publishes one reading a
      day, a short interval brings nothing;

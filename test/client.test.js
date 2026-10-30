@@ -33,6 +33,16 @@ test('signs in with the Cognito client id of the chosen portal', async () => {
   );
 });
 
+test('every portal is a Veolia host with its own Cognito client', () => {
+  // The key is matched against the town lookup redirection host.
+  for (const host of Object.keys(PORTALS)) {
+    assert.match(host, /^[a-z0-9-]+(\.[a-z0-9-]+)*\.eau\.veolia\.fr$|^eau\.veolia\.fr$/, host);
+  }
+  const ids = Object.values(PORTALS).map((p) => p.clientId);
+  assert.equal(new Set(ids).size, ids.length);
+  for (const id of ids) assert.match(id, /^[a-z0-9]{25,26}$/);
+});
+
 test('an unknown portal falls back to eau.veolia.fr', () => {
   const client = clientFor(createFakePortal(), { portal: 'nope.example' });
   assert.equal(client.clientId, PORTALS['eau.veolia.fr'].clientId);

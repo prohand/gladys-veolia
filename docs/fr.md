@@ -21,7 +21,8 @@ exemple, Metz (57000) répond « Compatible, portail eau.veolia.fr ».
 1. Ouvrez l'onglet **Configuration** de l'intégration.
 2. Saisissez l'**e-mail** et le **mot de passe** de votre espace client.
 3. **Espace client** : gardez `eau.veolia.fr`, sauf si le bouton _Vérifier ma
-   commune_ vous indique un autre portail (Eau de Toulouse Métropole).
+   commune_ vous indique un autre portail (Eau de Toulouse Métropole, Vendée
+   Eau, C Mon O, Nantes Métropole…).
 4. Réglages facultatifs :
    - **Intervalle de rafraîchissement** (6 h par défaut) : Veolia ne publie
      qu'un relevé par jour, inutile de descendre très bas ;

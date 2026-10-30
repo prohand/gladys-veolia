@@ -21,7 +21,8 @@ lautet die Antwort zum Beispiel „Unterstützt, Portal eau.veolia.fr“.
 1. Öffne den Tab **Konfiguration** der Integration.
 2. Gib die **E-Mail-Adresse** und das **Passwort** deines Kundenkontos ein.
 3. **Kundenportal**: Behalte `eau.veolia.fr`, außer _Meine Gemeinde prüfen_
-   nennt ein anderes Portal (Eau de Toulouse Métropole).
+   nennt ein anderes Portal (Eau de Toulouse Métropole, Vendée Eau, C Mon O,
+   Nantes Métropole…).
 4. Optionale Einstellungen:
    - **Aktualisierungsintervall** (standardmäßig 6 h): Veolia veröffentlicht
      einen Messwert pro Tag, ein kurzes Intervall bringt nichts;

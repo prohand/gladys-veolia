@@ -19,7 +19,10 @@
     "télérelève",
     "fuite d'eau",
     "eau de toulouse",
-    "toulouse métropole"
+    "toulouse métropole",
+    "vendée eau",
+    "nantes métropole",
+    "c mon o"
   ],
   "countries": ["FR"],
   "transports": ["cloud"],
@@ -122,12 +125,111 @@
           }
         },
         {
+          "value": "atlantic-eau.monespace.eau.veolia.fr",
+          "label": {
+            "en": "Atlantic'Eau",
+            "fr": "Atlantic'Eau",
+            "de": "Atlantic'Eau",
+            "es": "Atlantic'Eau"
+          }
+        },
+        {
+          "value": "c-mon-o.monespace.eau.veolia.fr",
+          "label": {
+            "en": "C Mon O",
+            "fr": "C Mon O",
+            "de": "C Mon O",
+            "es": "C Mon O"
+          }
+        },
+        {
+          "value": "eaudelacall.monespace.eau.veolia.fr",
+          "label": {
+            "en": "Calléo",
+            "fr": "Calléo",
+            "de": "Calléo",
+            "es": "Calléo"
+          }
+        },
+        {
           "value": "eaudetm.monespace.eau.veolia.fr",
           "label": {
             "en": "Eau de Toulouse Métropole",
             "fr": "Eau de Toulouse Métropole",
             "de": "Eau de Toulouse Métropole",
             "es": "Eau de Toulouse Métropole"
+          }
+        },
+        {
+          "value": "coquelicot.monespace.eau.veolia.fr",
+          "label": {
+            "en": "Eau du Coquelicot",
+            "fr": "Eau du Coquelicot",
+            "de": "Eau du Coquelicot",
+            "es": "Eau du Coquelicot"
+          }
+        },
+        {
+          "value": "eaux-de-dinan.monespace.eau.veolia.fr",
+          "label": {
+            "en": "Eaux de Dinan",
+            "fr": "Eaux de Dinan",
+            "de": "Eaux de Dinan",
+            "es": "Eaux de Dinan"
+          }
+        },
+        {
+          "value": "nantes-metropole.monespace.eau.veolia.fr",
+          "label": {
+            "en": "Nantes Métropole",
+            "fr": "Nantes Métropole",
+            "de": "Nantes Métropole",
+            "es": "Nantes Métropole"
+          }
+        },
+        {
+          "value": "odici.monespace.eau.veolia.fr",
+          "label": {
+            "en": "Odici",
+            "fr": "Odici",
+            "de": "Odici",
+            "es": "Odici"
+          }
+        },
+        {
+          "value": "brivalsmaepob.monespace.eau.veolia.fr",
+          "label": {
+            "en": "SMAEP Ouest Briard",
+            "fr": "SMAEP Ouest Briard",
+            "de": "SMAEP Ouest Briard",
+            "es": "SMAEP Ouest Briard"
+          }
+        },
+        {
+          "value": "sobass.monespace.eau.veolia.fr",
+          "label": {
+            "en": "Sobass",
+            "fr": "Sobass",
+            "de": "Sobass",
+            "es": "Sobass"
+          }
+        },
+        {
+          "value": "valyo.monespace.eau.veolia.fr",
+          "label": {
+            "en": "Valyo",
+            "fr": "Valyo",
+            "de": "Valyo",
+            "es": "Valyo"
+          }
+        },
+        {
+          "value": "monespace85.eau.veolia.fr",
+          "label": {
+            "en": "Vendée Eau",
+            "fr": "Vendée Eau",
+            "de": "Vendée Eau",
+            "es": "Vendée Eau"
           }
         }
       ]
