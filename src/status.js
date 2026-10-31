@@ -65,6 +65,17 @@ export function gladysFailed(detail) {
 export function testResult(meters) {
   const lines = meters.map(({ subscription, summary }) => {
     const last = summary.lastReading;
+    const mode = subscription.readingMode;
+    if (!last && mode && mode !== 'TELERELEVE') {
+      // Radio-read or manually read meters: Veolia only has the billed
+      // volumes, no daily reading to show.
+      return {
+        en: `Meter ${subscription.meter}: no daily reading, Veolia reads it as "${mode}". Only remote-read (TELERELEVE) meters have daily readings.`,
+        fr: `Compteur ${subscription.meter} : aucun relevé journalier, Veolia le relève en « ${mode} ». Seuls les compteurs télérelevés (TELERELEVE) ont des relevés journaliers.`,
+        de: `Zähler ${subscription.meter}: kein täglicher Messwert, Veolia liest ihn als „${mode}“ ab. Nur fernausgelesene Zähler (TELERELEVE) haben tägliche Messwerte.`,
+        es: `Contador ${subscription.meter}: ninguna lectura diaria, Veolia lo lee como «${mode}». Solo los contadores con telelectura (TELERELEVE) tienen lecturas diarias.`,
+      };
+    }
     if (!last) {
       return {
         en: `Meter ${subscription.meter}: no reading yet.`,

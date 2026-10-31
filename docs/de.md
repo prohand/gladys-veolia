@@ -114,8 +114,11 @@ und mir senden: _Letzter Monat: {{…cubic_meters}} m³_“.
 - **„WAF block“** im Status: Veolia (über AWS) sperrt einige Serveradressen
   (Hosting-Anbieter, VPNs). Von einem normalen Heimanschluss aus sollte das
   nicht passieren.
-- **Kein täglicher Verbrauch**: Dein Zähler ist wahrscheinlich nicht
-  fernablesbar. Prüfe es auf der Veolia-Website.
+- **Kein täglicher Verbrauch, leere Werte**: Dein Zähler ist wahrscheinlich
+  nicht fernablesbar. **Verbindung testen** zeigt die Ableseart, die Veolia
+  angibt (`RADIORELEVE`, `MANUAL`…), die Logs ebenfalls bei jeder
+  Aktualisierung. Auf der Veolia-Website: „Type de relève“ deines Abonnements.
+  Nur fernausgelesene Zähler haben tägliche Messwerte.
 - **Gemeinde „noch nicht unterstützt“**: Deine Gemeinde hat ein eigenes
   Veolia-Portal. Eröffne ein Issue im GitHub-Repository mit der Adresse des
   Portals.

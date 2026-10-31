@@ -127,10 +127,19 @@ export function buildReadingStates(gladys, pds, readings) {
 export function buildStates(gladys, pds, readings, summary) {
   const ids = meterIds(gladys, pds);
   const states = buildReadingStates(gladys, pds, readings);
-  // Running totals: their value is "as of now".
-  states.push(
-    { device_feature_external_id: ids.feature(FEATURE.MONTH), state: summary.currentMonthM3 },
-    { device_feature_external_id: ids.feature(FEATURE.YEAR), state: summary.currentYearM3 },
-  );
+  // Running totals: their value is "as of now". Unknown (null) totals are not
+  // published: a 0 would draw a false reading in the history.
+  if (summary.currentMonthM3 !== null) {
+    states.push({
+      device_feature_external_id: ids.feature(FEATURE.MONTH),
+      state: summary.currentMonthM3,
+    });
+  }
+  if (summary.currentYearM3 !== null) {
+    states.push({
+      device_feature_external_id: ids.feature(FEATURE.YEAR),
+      state: summary.currentYearM3,
+    });
+  }
   return states;
 }

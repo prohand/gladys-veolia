@@ -78,6 +78,17 @@ test('testResult describes each meter', () => {
   );
 });
 
+test('testResult explains a meter that is not remote-read', () => {
+  const message = testResult([
+    {
+      subscription: { meter: 'M3', readingMode: 'RADIORELEVE' },
+      summary: { lastReading: null, indexM3: null },
+    },
+  ]);
+  assertAllLanguages({ message }, 'testResult');
+  assert.match(message.fr, /Compteur M3 : aucun relevé journalier.*« RADIORELEVE »/);
+});
+
 test('every message is in English, French, German and Spanish', () => {
   assertAllLanguages(MESSAGES, 'MESSAGES');
   assertAllLanguages(unreachable('timeout'), 'unreachable');

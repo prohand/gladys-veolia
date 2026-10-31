@@ -128,12 +128,15 @@ export function summarize({ daily, monthly, today }) {
     : (monthM3(daily, [], current) ?? 0);
   const yearTotal = yearMonths.reduce((sum, m) => sum + m.m3, 0) + missingThisMonth;
   const lastIndex = [...daily].reverse().find((d) => d.indexM3 !== null)?.indexM3 ?? null;
+  // Veolia sent nothing at all (e.g. a meter that is not remote-read): the
+  // totals are unknown, not zero. A 0 would look like a real reading.
+  const known = daily.length > 0 || monthly.length > 0;
   return {
     lastReading: last,
     indexM3: lastIndex,
-    currentMonthM3: monthM3(daily, monthly, current) ?? 0,
+    currentMonthM3: known ? (monthM3(daily, monthly, current) ?? 0) : null,
     previousMonthM3: monthM3(daily, monthly, previous),
-    currentYearM3: round3(yearTotal),
+    currentYearM3: known ? round3(yearTotal) : null,
     daysSinceReading: last ? daysBetween(last.date, today) : null,
   };
 }

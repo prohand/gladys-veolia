@@ -107,8 +107,11 @@ send me: _Last month: {{…cubic_meters}} m³_".
 - **"WAF block"** in the status: Veolia (through AWS) blocks some server
   addresses (hosting providers, VPNs). From a regular home connection this
   should not happen.
-- **No daily consumption**: your meter is probably not remote-read. Check on
-  the Veolia website.
+- **No daily consumption, empty values**: your meter is probably not
+  remote-read. **Test the connection** shows the reading mode Veolia gives
+  (`RADIORELEVE`, `MANUAL`…), and so do the logs at every refresh. On the
+  Veolia website: "Type de relève" of your subscription. Only remote-read
+  meters have daily readings.
 - **Town "not supported yet"**: your town has its own Veolia portal. Open an
   issue on the GitHub repository with the portal address.
 

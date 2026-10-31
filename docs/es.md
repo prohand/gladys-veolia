@@ -110,8 +110,11 @@ enviarme: _El mes pasado: {{…cubic_meters}} m³_».
 - **«WAF block»** en el estado: Veolia (a través de AWS) bloquea algunas
   direcciones de servidor (proveedores de alojamiento, VPN). Desde una conexión
   doméstica normal no debería ocurrir.
-- **Ningún consumo diario**: probablemente su contador no tiene telelectura.
-  Compruébelo en la web de Veolia.
+- **Ningún consumo diario, valores vacíos**: probablemente su contador no
+  tiene telelectura. **Probar la conexión** muestra el modo de lectura que da
+  Veolia (`RADIORELEVE`, `MANUAL`…), y los logs también en cada actualización.
+  En la web de Veolia: «Type de relève» de su contrato. Solo los contadores con
+  telelectura tienen lecturas diarias.
 - **Municipio «todavía no compatible»**: su municipio tiene su propio portal de
   Veolia. Abra una issue en el repositorio de GitHub con la dirección del
   portal.

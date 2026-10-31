@@ -267,6 +267,13 @@ export class VeoliaSync {
     }
     const daily = normalizeDaily(dailyRecords);
     const monthly = normalizeMonthly(monthlyRecords);
+    // What Veolia sent, at every refresh: "connected but everything at zero"
+    // cannot be diagnosed from the logs otherwise.
+    logger.info(
+      `Meter ${subscription.pds} (reading mode ${subscription.readingMode ?? 'unknown'}): ` +
+        `${dailyRecords.length} daily record(s) -> ${daily.length} reading(s), ` +
+        `${monthlyRecords.length} monthly record(s) -> ${monthly.length} total(s)`,
+    );
     return { subscription, daily, monthly, summary: summarize({ daily, monthly, today }) };
   }
 

@@ -53,6 +53,16 @@ test('adding the device sends the known history with the reading dates', async (
   assert.equal(store.get(ACCOUNT.pds, 'published'), '2026-10-08');
 });
 
+test('a meter that is not remote-read publishes no fake zero', async () => {
+  const { gladys, sync } = setup({ readingMode: 'RADIORELEVE' });
+  assert.deepEqual(await sync.refresh(), { ok: true });
+  gladys.createAllDevices();
+  await sync.onDeviceCreated(DEVICE_ID);
+  await sync.refresh();
+  assert.deepEqual(gladys.published, [], 'no reading, no 0 m³ total');
+  assert.equal(sync.meterOf().subscription.readingMode, 'RADIORELEVE');
+});
+
 test('later refreshes only publish the new readings', async () => {
   const { gladys, sync, portal, clock } = setup({ daily: history() });
   await sync.refresh();

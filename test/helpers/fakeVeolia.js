@@ -46,10 +46,11 @@ export function dailyRange(from, to, { startIndex = 400, liters = (i) => 100 + i
   return records;
 }
 
-export function createFakePortal({ daily = [], monthly = [] } = {}) {
+export function createFakePortal({ daily = [], monthly = [], readingMode = 'TELERELEVE' } = {}) {
   const portal = {
     daily,
     monthly,
+    readingMode, // facturation.mode_releve: TELERELEVE, RADIORELEVE, MANUAL
     calls: [],
     logins: 0,
     failures: [], // [{ match: RegExp, status }] consumed in order
@@ -116,6 +117,7 @@ export function createFakePortal({ daily = [], monthly = [] } = {}) {
       return json(200, {
         numero_pds: ACCOUNT.pds,
         date_debut_abonnement: ACCOUNT.startDate,
+        mode_releve: portal.readingMode,
       });
     }
     if (path === `/consommations/${ACCOUNT.subscriptionId}/journalieres`) {

@@ -92,9 +92,18 @@ test('summarize without any data', () => {
   const summary = summarize({ daily: [], monthly: [], today: '2026-10-04' });
   assert.equal(summary.lastReading, null);
   assert.equal(summary.indexM3, null);
-  assert.equal(summary.currentMonthM3, 0);
+  // Unknown, not zero: a radio-read meter has no reading at all.
+  assert.equal(summary.currentMonthM3, null);
+  assert.equal(summary.currentYearM3, null);
   assert.equal(summary.previousMonthM3, null);
   assert.equal(summary.daysSinceReading, null);
+});
+
+test('summarize with readings but none this month counts 0 for the month', () => {
+  const monthly = normalizeMonthly([{ annee: 2026, mois: 9, consommation: { m3: 3 } }]);
+  const summary = summarize({ daily: [], monthly, today: '2026-10-04' });
+  assert.equal(summary.currentMonthM3, 0);
+  assert.equal(summary.currentYearM3, 3);
 });
 
 test('consumptionOf answers every period', () => {
