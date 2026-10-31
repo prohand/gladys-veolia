@@ -6,6 +6,8 @@ All notable changes to this integration are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.3.2] - 2026-10-31
+
 ### Changed
 
 - "Test the connection" on a meter without any reading always gives the
@@ -105,7 +107,8 @@ All notable changes to this integration are documented here. The format follows
   image and runs the store admission checks; Dependabot keeps the npm
   dependencies, the GitHub Actions and the Docker base image up to date.
 
-[Unreleased]: https://github.com/prohand/gladys-veolia/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/prohand/gladys-veolia/compare/v1.3.2...HEAD
+[1.3.2]: https://github.com/prohand/gladys-veolia/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/prohand/gladys-veolia/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/prohand/gladys-veolia/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/prohand/gladys-veolia/compare/v1.1.1...v1.2.0
