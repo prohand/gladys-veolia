@@ -114,7 +114,9 @@ et m'envoyer : _Le mois dernier : {{…cubic_meters}} m³_ ».
   sans doute pas télérelevé. **Tester la connexion** affiche le type de relève
   donné par Veolia (`RADIORELEVE`, `MANUAL`…), les logs aussi à chaque
   rafraîchissement. Sur le site Veolia : « Type de relève » de votre abonnement.
-  Seuls les compteurs télérelevés ont des relevés journaliers.
+  Seuls les compteurs télérelevés ont des relevés journaliers. Si le compteur
+  est télérelevé ou si le type est « non indiqué », le message donne aussi le
+  nombre de relevés envoyés par Veolia : copiez-le dans une demande GitHub.
 - **Commune « pas encore prise en charge »** : votre commune a son propre
   portail Veolia. Ouvrez une demande sur le dépôt GitHub en donnant l'adresse
   du portail.

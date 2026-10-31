@@ -74,8 +74,24 @@ test('testResult describes each meter', () => {
   ]);
   assert.equal(
     message.fr,
-    'Connecté. Compteur M1 : 120 L le 2026-10-08, index 400.5 m³. Compteur M2 : aucun relevé pour l’instant.',
+    'Connecté. Compteur M1 : 120 L le 2026-10-08, index 400.5 m³. Compteur M2 : aucun relevé pour l’instant (type de relève : non indiqué ; Veolia a envoyé 0 relevé(s) par jour et 0 par mois).',
   );
+});
+
+test('testResult says what Veolia sent for a remote-read meter without reading', () => {
+  const message = testResult([
+    {
+      subscription: { meter: 'M4', readingMode: 'TELERELEVE' },
+      summary: { lastReading: null, indexM3: null },
+      received: { daily: 31, monthly: 2 },
+    },
+  ]);
+  assertAllLanguages({ message }, 'testResult');
+  assert.match(
+    message.fr,
+    /Compteur M4 : aucun relevé pour l’instant \(type de relève : TELERELEVE ; Veolia a envoyé 31 relevé\(s\) par jour et 2 par mois\)/,
+  );
+  assert.match(message.en, /reading mode: TELERELEVE; Veolia sent 31 daily and 2 monthly/);
 });
 
 test('testResult explains a meter that is not remote-read', () => {

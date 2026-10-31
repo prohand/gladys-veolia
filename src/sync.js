@@ -274,7 +274,14 @@ export class VeoliaSync {
         `${dailyRecords.length} daily record(s) -> ${daily.length} reading(s), ` +
         `${monthlyRecords.length} monthly record(s) -> ${monthly.length} total(s)`,
     );
-    return { subscription, daily, monthly, summary: summarize({ daily, monthly, today }) };
+    return {
+      subscription,
+      daily,
+      monthly,
+      // Raw record counts, for "Test the connection" when no reading is usable.
+      received: { daily: dailyRecords.length, monthly: monthlyRecords.length },
+      summary: summarize({ daily, monthly, today }),
+    };
   }
 
   isCreated(meter) {

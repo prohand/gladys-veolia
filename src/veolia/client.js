@@ -156,6 +156,13 @@ export class VeoliaClient {
         if (!billing?.numero_pds || !billing?.date_debut_abonnement) {
           throw new VeoliaApiError('Billing data without delivery point');
         }
+        if (!billing.mode_releve) {
+          // Seen on a delegated portal (C Mon O): the field may have another
+          // name there. Field names only, never their values.
+          logger.warn(
+            `Subscription ${id}: no mode_releve in the billing data, fields: ${Object.keys(billing).join(', ')}`,
+          );
+        }
         subscriptions.push({
           id,
           pds: String(billing.numero_pds).trim(),

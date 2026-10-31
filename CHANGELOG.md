@@ -6,6 +6,13 @@ All notable changes to this integration are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- "Test the connection" on a meter without any reading always gives the
+  reading mode (or says Veolia gave none) and how many daily and monthly
+  records Veolia sent. The logs list the billing fields when Veolia gives no
+  reading mode (field names only).
+
 ## [1.3.1] - 2026-10-31
 
 ### Changed
