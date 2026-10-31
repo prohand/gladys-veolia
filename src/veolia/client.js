@@ -161,6 +161,9 @@ export class VeoliaClient {
           pds: String(billing.numero_pds).trim(),
           meter: String(abonnement.numero_compteur ?? billing.numero_pds).trim(),
           startDate: String(billing.date_debut_abonnement).slice(0, 10),
+          // TELERELEVE, RADIORELEVE or MANUAL: the portal only has daily and
+          // monthly readings for remote-read (TELERELEVE) meters.
+          readingMode: billing.mode_releve ? String(billing.mode_releve) : null,
         });
       } catch (err) {
         // A terminated subscription can stay listed: keep reading the others.

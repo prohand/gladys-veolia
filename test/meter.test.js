@@ -59,3 +59,8 @@ test('daily readings are past states, totals are current', () => {
     { device_feature_external_id: ids.feature(FEATURE.YEAR), state: 9.25 },
   ]);
 });
+
+test('unknown totals are not published', () => {
+  const states = buildStates(gladys, 'PDS0042', [], { currentMonthM3: null, currentYearM3: null });
+  assert.deepEqual(states, []);
+});

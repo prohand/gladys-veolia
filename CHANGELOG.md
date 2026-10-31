@@ -6,6 +6,18 @@ All notable changes to this integration are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- "Test the connection" names the Veolia reading mode of a meter without any
+  reading (`RADIORELEVE`, `MANUAL`…): only remote-read meters have daily
+  readings. The logs give, at every refresh, the reading mode and how many
+  readings Veolia sent.
+
+### Fixed
+
+- A meter without any reading no longer shows 0 m³ for the month and the
+  year: the values stay empty instead of looking like a real reading.
+
 ## [1.3.0] - 2026-10-30
 
 ### Added

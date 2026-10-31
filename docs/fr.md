@@ -110,8 +110,11 @@ et m'envoyer : _Le mois dernier : {{…cubic_meters}} m³_ ».
 - **« WAF block »** dans le statut : Veolia (via AWS) bloque certaines
   adresses de serveurs (hébergeurs, VPN). Depuis une box internet classique,
   cela ne devrait pas arriver.
-- **Pas de consommation journalière** : votre compteur n'est sans doute pas
-  télérelevé. Vérifiez sur le site Veolia.
+- **Pas de consommation journalière, valeurs vides** : votre compteur n'est
+  sans doute pas télérelevé. **Tester la connexion** affiche le type de relève
+  donné par Veolia (`RADIORELEVE`, `MANUAL`…), les logs aussi à chaque
+  rafraîchissement. Sur le site Veolia : « Type de relève » de votre abonnement.
+  Seuls les compteurs télérelevés ont des relevés journaliers.
 - **Commune « pas encore prise en charge »** : votre commune a son propre
   portail Veolia. Ouvrez une demande sur le dépôt GitHub en donnant l'adresse
   du portail.

@@ -72,6 +72,7 @@ test('reads the subscriptions with their delivery point and start date', async (
       pds: ACCOUNT.pds,
       meter: ACCOUNT.meter,
       startDate: ACCOUNT.startDate,
+      readingMode: 'TELERELEVE',
     },
   ]);
 });
