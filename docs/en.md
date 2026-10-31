@@ -111,7 +111,9 @@ send me: _Last month: {{…cubic_meters}} m³_".
   remote-read. **Test the connection** shows the reading mode Veolia gives
   (`RADIORELEVE`, `MANUAL`…), and so do the logs at every refresh. On the
   Veolia website: "Type de relève" of your subscription. Only remote-read
-  meters have daily readings.
+  meters have daily readings. When the meter is remote-read or the mode is
+  "not given", the message also counts the records Veolia sent: copy it into
+  a GitHub issue.
 - **Town "not supported yet"**: your town has its own Veolia portal. Open an
   issue on the GitHub repository with the portal address.
 

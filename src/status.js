@@ -63,7 +63,7 @@ export function gladysFailed(detail) {
 
 /** Answer of the "Test the connection" action. */
 export function testResult(meters) {
-  const lines = meters.map(({ subscription, summary }) => {
+  const lines = meters.map(({ subscription, summary, received }) => {
     const last = summary.lastReading;
     const mode = subscription.readingMode;
     if (!last && mode && mode !== 'TELERELEVE') {
@@ -77,11 +77,19 @@ export function testResult(meters) {
       };
     }
     if (!last) {
+      // Remote-read, or no reading mode at all: say what Veolia sent, so a
+      // user's copy of this line is enough to tell an empty answer from
+      // records the normalizer could not read.
+      const daily = received?.daily ?? 0;
+      const monthly = received?.monthly ?? 0;
+      const modeText = mode
+        ? { en: mode, fr: mode, de: mode, es: mode }
+        : { en: 'not given', fr: 'non indiqué', de: 'nicht angegeben', es: 'no indicado' };
       return {
-        en: `Meter ${subscription.meter}: no reading yet.`,
-        fr: `Compteur ${subscription.meter} : aucun relevé pour l’instant.`,
-        de: `Zähler ${subscription.meter}: noch kein Messwert.`,
-        es: `Contador ${subscription.meter}: todavía no hay ninguna lectura.`,
+        en: `Meter ${subscription.meter}: no reading yet (reading mode: ${modeText.en}; Veolia sent ${daily} daily and ${monthly} monthly record(s)).`,
+        fr: `Compteur ${subscription.meter} : aucun relevé pour l’instant (type de relève : ${modeText.fr} ; Veolia a envoyé ${daily} relevé(s) par jour et ${monthly} par mois).`,
+        de: `Zähler ${subscription.meter}: noch kein Messwert (Ableseart: ${modeText.de}; Veolia hat ${daily} Tages- und ${monthly} Monatsdatensätze gesendet).`,
+        es: `Contador ${subscription.meter}: todavía no hay ninguna lectura (modo de lectura: ${modeText.es}; Veolia envió ${daily} registro(s) diarios y ${monthly} mensuales).`,
       };
     }
     const index = summary.indexM3 === null ? '' : `, index ${summary.indexM3} m³`;

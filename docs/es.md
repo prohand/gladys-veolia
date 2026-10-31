@@ -114,7 +114,9 @@ enviarme: _El mes pasado: {{…cubic_meters}} m³_».
   tiene telelectura. **Probar la conexión** muestra el modo de lectura que da
   Veolia (`RADIORELEVE`, `MANUAL`…), y los logs también en cada actualización.
   En la web de Veolia: «Type de relève» de su contrato. Solo los contadores con
-  telelectura tienen lecturas diarias.
+  telelectura tienen lecturas diarias. Si el contador tiene telelectura o el
+  modo es «no indicado», el mensaje también cuenta los registros enviados por
+  Veolia: cópielo en una issue de GitHub.
 - **Municipio «todavía no compatible»**: su municipio tiene su propio portal de
   Veolia. Abra una issue en el repositorio de GitHub con la dirección del
   portal.

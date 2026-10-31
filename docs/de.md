@@ -118,7 +118,9 @@ und mir senden: _Letzter Monat: {{…cubic_meters}} m³_“.
   nicht fernablesbar. **Verbindung testen** zeigt die Ableseart, die Veolia
   angibt (`RADIORELEVE`, `MANUAL`…), die Logs ebenfalls bei jeder
   Aktualisierung. Auf der Veolia-Website: „Type de relève“ deines Abonnements.
-  Nur fernausgelesene Zähler haben tägliche Messwerte.
+  Nur fernausgelesene Zähler haben tägliche Messwerte. Ist der Zähler
+  fernausgelesen oder die Ableseart „nicht angegeben“, zählt die Meldung auch
+  die von Veolia gesendeten Datensätze: Kopiere sie in ein GitHub-Issue.
 - **Gemeinde „noch nicht unterstützt“**: Deine Gemeinde hat ein eigenes
   Veolia-Portal. Eröffne ein Issue im GitHub-Repository mit der Adresse des
   Portals.
