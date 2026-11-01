@@ -7,7 +7,8 @@ dashboard widget, and cards for your scenes.
 ## What you need
 
 - A **remote-read** water meter (télérelève): it sends your consumption to
-  Veolia every day. Without it, Veolia only has one reading a year.
+  Veolia every day. Without it, Veolia only has your bills: the integration
+  then shows the billed volumes (see below).
 - A **Veolia customer account** with an e-mail and a password. Check that the
   Veolia website shows your consumption day by day.
 - Gladys **5.3 or later**.
@@ -52,6 +53,21 @@ keep them.
 | Consommation journalière | L    | Litres used each day, stored on the reading day |
 | Consommation du mois     | m³   | Total of the current month                      |
 | Consommation de l'année  | m³   | Total of the current calendar year              |
+
+### Meter that is not remote-read
+
+When Veolia does not read your meter remotely (reading mode `RADIORELEVE`,
+`MANUAL` or not given, as on C Mon O), there is no daily reading. The Veolia
+website then only lists your bills, and so does the integration:
+
+- the device has one more value, **Consommation facturée** (m³): the volume
+  of each bill, stored on the bill date;
+- the **Index** takes the index of each bill, on its date;
+- the day, month and year consumptions stay empty;
+- the widget shows the last bill, the index and a chart of the last bills.
+
+These values only change a few times a year. If the device was already
+added, open **Discovery** and click **Update** to add the new value.
 
 The device card carries the **Cloud** badge while the Veolia portal answers,
 **Unreachable** when it does not, with an orange dot when no reading came for
@@ -111,7 +127,8 @@ send me: _Last month: {{…cubic_meters}} m³_".
   remote-read. **Test the connection** shows the reading mode Veolia gives
   (`RADIORELEVE`, `MANUAL`…), and so do the logs at every refresh. On the
   Veolia website: "Type de relève" of your subscription. Only remote-read
-  meters have daily readings. When the meter is remote-read or the mode is
+  meters have daily readings: the others show their bills (see _Meter that
+  is not remote-read_). When the meter is remote-read or the mode is
   "not given", the message also counts the records Veolia sent: copy it into
   a GitHub issue.
 - **Town "not supported yet"**: your town has its own Veolia portal. Open an

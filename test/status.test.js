@@ -74,7 +74,7 @@ test('testResult describes each meter', () => {
   ]);
   assert.equal(
     message.fr,
-    'Connecté. Compteur M1 : 120 L le 2026-10-08, index 400.5 m³. Compteur M2 : aucun relevé pour l’instant (type de relève : non indiqué ; Veolia a envoyé 0 relevé(s) par jour et 0 par mois).',
+    'Connecté. Compteur M1 : 120 L le 2026-10-08, index 400.5 m³. Compteur M2 : aucun relevé pour l’instant (type de relève : non indiqué ; Veolia a envoyé 0 relevé(s) par jour, 0 par mois et 0 facture(s)).',
   );
 });
 
@@ -83,15 +83,18 @@ test('testResult says what Veolia sent for a remote-read meter without reading',
     {
       subscription: { meter: 'M4', readingMode: 'TELERELEVE' },
       summary: { lastReading: null, indexM3: null },
-      received: { daily: 31, monthly: 2 },
+      received: { daily: 31, monthly: 2, billed: 0 },
     },
   ]);
   assertAllLanguages({ message }, 'testResult');
   assert.match(
     message.fr,
-    /Compteur M4 : aucun relevé pour l’instant \(type de relève : TELERELEVE ; Veolia a envoyé 31 relevé\(s\) par jour et 2 par mois\)/,
+    /Compteur M4 : aucun relevé pour l’instant \(type de relève : TELERELEVE ; Veolia a envoyé 31 relevé\(s\) par jour, 2 par mois et 0 facture\(s\)\)/,
   );
-  assert.match(message.en, /reading mode: TELERELEVE; Veolia sent 31 daily and 2 monthly/);
+  assert.match(
+    message.en,
+    /reading mode: TELERELEVE; Veolia sent 31 daily, 2 monthly and 0 billed/,
+  );
 });
 
 test('testResult explains a meter that is not remote-read', () => {
@@ -103,6 +106,25 @@ test('testResult explains a meter that is not remote-read', () => {
   ]);
   assertAllLanguages({ message }, 'testResult');
   assert.match(message.fr, /Compteur M3 : aucun relevé journalier.*« RADIORELEVE »/);
+});
+
+test('testResult gives the last bill of a meter that is not remote-read', () => {
+  const message = testResult([
+    {
+      subscription: { meter: 'M5', readingMode: null },
+      summary: {
+        lastReading: null,
+        indexM3: 1234,
+        lastBill: { date: '2026-09-14', from: '2026-03-12', m3: 42.5, indexM3: 1234 },
+      },
+      received: { daily: 0, monthly: 0, billed: 2 },
+    },
+  ]);
+  assertAllLanguages({ message }, 'testResult');
+  assert.equal(
+    message.fr,
+    'Connecté. Compteur M5 : non télérelevé, Veolia n’a que ses factures. Dernière facture : 42.5 m³ (2026-03-12 → 2026-09-14), index 1234 m³.',
+  );
 });
 
 test('every message is in English, French, German and Spanish', () => {

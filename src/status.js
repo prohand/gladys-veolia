@@ -66,6 +66,18 @@ export function testResult(meters) {
   const lines = meters.map(({ subscription, summary, received }) => {
     const last = summary.lastReading;
     const mode = subscription.readingMode;
+    const bill = summary.lastBill;
+    if (!last && bill) {
+      // Not remote-read: the bills are all Veolia has (a few a year).
+      const period = bill.from ? `${bill.from} → ${bill.date}` : bill.date;
+      const index = bill.indexM3 === null ? '' : `, index ${bill.indexM3} m³`;
+      return {
+        en: `Meter ${subscription.meter}: not remote-read, Veolia only has its bills. Last bill: ${bill.m3} m³ (${period})${index}.`,
+        fr: `Compteur ${subscription.meter} : non télérelevé, Veolia n’a que ses factures. Dernière facture : ${bill.m3} m³ (${period})${index}.`,
+        de: `Zähler ${subscription.meter}: nicht fernausgelesen, Veolia hat nur seine Rechnungen. Letzte Rechnung: ${bill.m3} m³ (${period})${index}.`,
+        es: `Contador ${subscription.meter}: sin telelectura, Veolia solo tiene sus facturas. Última factura: ${bill.m3} m³ (${period})${index}.`,
+      };
+    }
     if (!last && mode && mode !== 'TELERELEVE') {
       // Radio-read or manually read meters: Veolia only has the billed
       // volumes, no daily reading to show.
@@ -82,14 +94,15 @@ export function testResult(meters) {
       // records the normalizer could not read.
       const daily = received?.daily ?? 0;
       const monthly = received?.monthly ?? 0;
+      const billed = received?.billed ?? 0;
       const modeText = mode
         ? { en: mode, fr: mode, de: mode, es: mode }
         : { en: 'not given', fr: 'non indiqué', de: 'nicht angegeben', es: 'no indicado' };
       return {
-        en: `Meter ${subscription.meter}: no reading yet (reading mode: ${modeText.en}; Veolia sent ${daily} daily and ${monthly} monthly record(s)).`,
-        fr: `Compteur ${subscription.meter} : aucun relevé pour l’instant (type de relève : ${modeText.fr} ; Veolia a envoyé ${daily} relevé(s) par jour et ${monthly} par mois).`,
-        de: `Zähler ${subscription.meter}: noch kein Messwert (Ableseart: ${modeText.de}; Veolia hat ${daily} Tages- und ${monthly} Monatsdatensätze gesendet).`,
-        es: `Contador ${subscription.meter}: todavía no hay ninguna lectura (modo de lectura: ${modeText.es}; Veolia envió ${daily} registro(s) diarios y ${monthly} mensuales).`,
+        en: `Meter ${subscription.meter}: no reading yet (reading mode: ${modeText.en}; Veolia sent ${daily} daily, ${monthly} monthly and ${billed} billed record(s)).`,
+        fr: `Compteur ${subscription.meter} : aucun relevé pour l’instant (type de relève : ${modeText.fr} ; Veolia a envoyé ${daily} relevé(s) par jour, ${monthly} par mois et ${billed} facture(s)).`,
+        de: `Zähler ${subscription.meter}: noch kein Messwert (Ableseart: ${modeText.de}; Veolia hat ${daily} Tages-, ${monthly} Monats- und ${billed} Rechnungsdatensätze gesendet).`,
+        es: `Contador ${subscription.meter}: todavía no hay ninguna lectura (modo de lectura: ${modeText.es}; Veolia envió ${daily} registro(s) diarios, ${monthly} mensuales y ${billed} de facturas).`,
       };
     }
     const index = summary.indexM3 === null ? '' : `, index ${summary.indexM3} m³`;

@@ -46,11 +46,27 @@ export function dailyRange(from, to, { startIndex = 400, liters = (i) => 100 + i
   return records;
 }
 
-export function createFakePortal({ daily = [], monthly = [], readingMode = 'TELERELEVE' } = {}) {
+/** A bill as the backend sends it (meters that are not remote-read). */
+export function billedRecord(from, to, m3, index) {
+  return {
+    date_facturation_precedente: from,
+    date_facturation: to,
+    volume_facture_eau: { m3 },
+    index_facture: index,
+  };
+}
+
+export function createFakePortal({
+  daily = [],
+  monthly = [],
+  billed = [],
+  readingMode = 'TELERELEVE',
+} = {}) {
   const portal = {
     daily,
     monthly,
-    readingMode, // facturation.mode_releve: TELERELEVE, RADIORELEVE, MANUAL
+    billed,
+    readingMode, // facturation.mode_releve: TELERELEVE, RADIORELEVE, MANUAL; null = absent
     calls: [],
     logins: 0,
     failures: [], // [{ match: RegExp, status }] consumed in order
@@ -117,7 +133,8 @@ export function createFakePortal({ daily = [], monthly = [], readingMode = 'TELE
       return json(200, {
         numero_pds: ACCOUNT.pds,
         date_debut_abonnement: ACCOUNT.startDate,
-        mode_releve: portal.readingMode,
+        // Delegated portals (C Mon O) leave the field out.
+        ...(portal.readingMode === null ? {} : { mode_releve: portal.readingMode }),
       });
     }
     if (path === `/consommations/${ACCOUNT.subscriptionId}/journalieres`) {
@@ -133,6 +150,9 @@ export function createFakePortal({ daily = [], monthly = [], readingMode = 'TELE
         200,
         portal.monthly.filter((r) => r.annee === year),
       );
+    }
+    if (path === `/consommations/facturation/${ACCOUNT.subscriptionId}`) {
+      return json(200, portal.billed);
     }
     return json(404, {});
   };

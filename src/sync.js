@@ -10,7 +10,8 @@
 // the current month and the monthly totals of the last COMPARISON_YEARS years
 // (the comparison widget): about 5 requests. The data lives in memory between
 // refreshes: the widget, the scene actions and the device creation never call
-// Veolia themselves.
+// Veolia themselves. A meter that is not remote-read has no daily reading: its
+// bills are read instead (one request), see isRemoteRead().
 //
 // Once a meter is added in Gladys, its older daily readings (HISTORY_MONTHS
 // back) are imported in the background, one month at a time, so the Gladys
@@ -23,11 +24,19 @@ import {
   COMPARISON_YEARS,
   localDate,
   monthOf,
+  normalizeBilled,
   normalizeDaily,
   normalizeMonthly,
   summarize,
 } from './veolia/consumption.js';
-import { buildDevice, buildReadingStates, buildStates, meterIds } from './meter.js';
+import {
+  buildBilledStates,
+  buildDevice,
+  buildReadingStates,
+  buildStates,
+  isRemoteRead,
+  meterIds,
+} from './meter.js';
 import { isConfigured } from './config.js';
 import { MESSAGES, gladysFailed, unreachable } from './status.js';
 
@@ -95,7 +104,7 @@ export class VeoliaSync {
     this.config = null;
     this.client = null;
     this.subscriptions = null;
-    /** @type {Map<string, { subscription, daily, monthly, summary }>} */
+    /** @type {Map<string, { subscription, daily, monthly, billed, received, summary }>} */
     this.meters = new Map();
     this.running = null;
     // Bumped on every account change: a refresh started for the previous
@@ -254,33 +263,49 @@ export class VeoliaSync {
     // The endpoints refuse a period before the subscription started.
     const start = monthOf(subscription.startDate);
     const afterStart = (m) => monthIndex(m) >= monthIndex(start);
+    const mode = subscription.readingMode;
+    // The web portal only reads daily data for TELERELEVE. A missing mode
+    // still tries it: it costs a few empty answers, never a lost reading.
+    const readDaily = !mode || isRemoteRead(subscription);
 
     const dailyRecords = [];
-    for (const m of [previous, current].filter(afterStart)) {
-      dailyRecords.push(...(await client.getDailyReadings(subscription, m.year, m.month)));
-    }
     const monthlyRecords = [];
-    for (let year = current.year - COMPARISON_YEARS + 1; year <= current.year; year += 1) {
-      if (year >= start.year) {
-        monthlyRecords.push(...(await client.getMonthlyTotals(subscription, year)));
+    if (readDaily) {
+      for (const m of [previous, current].filter(afterStart)) {
+        dailyRecords.push(...(await client.getDailyReadings(subscription, m.year, m.month)));
+      }
+      for (let year = current.year - COMPARISON_YEARS + 1; year <= current.year; year += 1) {
+        if (year >= start.year) {
+          monthlyRecords.push(...(await client.getMonthlyTotals(subscription, year)));
+        }
       }
     }
+    const billedRecords = isRemoteRead(subscription)
+      ? []
+      : await client.getBilledVolumes(subscription);
     const daily = normalizeDaily(dailyRecords);
     const monthly = normalizeMonthly(monthlyRecords);
+    const billed = normalizeBilled(billedRecords);
     // What Veolia sent, at every refresh: "connected but everything at zero"
     // cannot be diagnosed from the logs otherwise.
     logger.info(
-      `Meter ${subscription.pds} (reading mode ${subscription.readingMode ?? 'unknown'}): ` +
+      `Meter ${subscription.pds} (reading mode ${mode ?? 'unknown'}): ` +
         `${dailyRecords.length} daily record(s) -> ${daily.length} reading(s), ` +
-        `${monthlyRecords.length} monthly record(s) -> ${monthly.length} total(s)`,
+        `${monthlyRecords.length} monthly record(s) -> ${monthly.length} total(s), ` +
+        `${billedRecords.length} billed record(s) -> ${billed.length} bill(s)`,
     );
     return {
       subscription,
       daily,
       monthly,
+      billed,
       // Raw record counts, for "Test the connection" when no reading is usable.
-      received: { daily: dailyRecords.length, monthly: monthlyRecords.length },
-      summary: summarize({ daily, monthly, today }),
+      received: {
+        daily: dailyRecords.length,
+        monthly: monthlyRecords.length,
+        billed: billedRecords.length,
+      },
+      summary: summarize({ daily, monthly, billed, today }),
     };
   }
 
@@ -310,6 +335,16 @@ export class VeoliaSync {
       this.store.set(pds, 'published', fresh.at(-1).date);
       logger.info(`Meter ${pds}: ${fresh.length} new daily reading(s) published`);
     }
+    const billedUntil = this.store.get(pds, 'billed');
+    const bills = (meter.billed ?? []).filter((bill) => !billedUntil || bill.date > billedUntil);
+    const billStates = buildBilledStates(this.gladys, pds, bills);
+    for (let i = 0; i < billStates.length; i += STATES_PER_BATCH) {
+      await this.gladys.publishStates(billStates.slice(i, i + STATES_PER_BATCH));
+    }
+    if (bills.length > 0) {
+      this.store.set(pds, 'billed', bills.at(-1).date);
+      logger.info(`Meter ${pds}: ${bills.length} new bill(s) published`);
+    }
   }
 
   /** The device was just added from the Discovery screen: send its history. */
@@ -319,6 +354,7 @@ export class VeoliaSync {
       return;
     }
     this.store.set(meter.subscription.pds, 'published', null);
+    this.store.set(meter.subscription.pds, 'billed', null);
     // A device deleted then added again has lost its history: import it again.
     this.store.set(meter.subscription.pds, 'history', null);
     await this.publishMeter(meter);
@@ -348,6 +384,10 @@ export class VeoliaSync {
       const { pds, startDate } = meter.subscription;
       const done = this.store.get(pds, 'history');
       if (!client || done === HISTORY_DONE || !this.isCreated(meter)) {
+        continue;
+      }
+      if (!isRemoteRead(meter.subscription) && meter.daily.length === 0) {
+        // No daily reading to import: its bills are all published already.
         continue;
       }
       // The refreshes publish the current and the previous month: start

@@ -46,8 +46,9 @@ connection lifecycle — and holds no Veolia logic.
 
 - **`src/veolia/client.js`** — the HTTP client. Cognito `InitiateAuth` (`USER_PASSWORD_AUTH`)
   → bearer token; then `prd-ael-sirius-backend.istefr.fr`: `/espace-client` (subscriptions),
-  `/abonnements/{id}/facturation` (PDS + start date), `/consommations/{id}/journalieres` and
-  `/mensuelles`. Retries network errors, 429 and 5xx (3 attempts); re-signs in once on 401.
+  `/abonnements/{id}/facturation` (PDS + start date + `mode_releve`),
+  `/consommations/{id}/journalieres` and `/mensuelles`, or `/consommations/facturation/{id}` (bills)
+  for a meter that is not remote-read. Retries network errors, 429 and 5xx (3 attempts); re-signs in once on 401.
   `lookupTowns()` reads the public town picker (no account).
 - **`src/veolia/portals.js`** — portal host → Cognito client id. The ids come from the public web
   bundle every portal serves (`cognitoUserpool<Portal>ClientId`, next to each production host);
@@ -59,20 +60,26 @@ connection lifecycle — and holds no Veolia logic.
   only the new readings, fires the scene triggers, reports the connection status. Once a meter is
   added, imports its `HISTORY_MONTHS` older months in the background (`importHistory`).
   The refresh and the import take turns on the Veolia client (`withPortal`).
-- **`src/store.js`** — `/data/veolia-state.json`: per PDS, last published reading, last reading
-  seen by the triggers, last overdue event, history import progress.
+- **`src/store.js`** — `/data/veolia-state.json`: per PDS, last published reading, last published
+  bill, last reading seen by the triggers, last overdue event, history import progress.
 - **`src/scenes.js`**, **`src/widgets.js`** — capability handlers, keyed by the manifest keys.
 
 ### Decisions that look arbitrary without their reason
 
 - **The device external id is `gladys.externalIds('meter', <PDS>)`**, not the meter serial:
   Veolia swaps meters on the same delivery point, and the history must survive. Feature keys
-  (`index`, `daily-consumption`, `month-consumption`, `year-consumption`) are forever.
+  (`index`, `daily-consumption`, `month-consumption`, `year-consumption`, `billed-consumption`)
+  are forever.
 - **Daily readings are past states** (`created_at` = reading day at 12:00 UTC, the same calendar
   day in France all year): Veolia publishes 1 to 3 days late.
 - **The core drops states of a feature that does not exist yet.** Nothing is published until the
   user adds the device (`gladys.devices`); `onDeviceCreated` then sends the known history. The
   `published` date only moves after a successful publication.
+- **A meter that is not remote-read reads its bills** (`isRemoteRead()`: `mode_releve` is
+  `TELERELEVE`): the Veolia web app itself only shows daily data for `TELERELEVE`, and its bills
+  view otherwise. Delegated portals (C Mon O) leave `mode_releve` out: a missing mode still tries
+  the daily endpoints too. Only those meters get the `billed-consumption` feature (volume and
+  index as past states on each bill date, store key `billed`); no history import for them.
 - **The history comes from Veolia, not from a file**: the SDK has no file field, and the portal
   keeps the daily readings. The import goes newest month first, one month every 20 s (≤ 62
   states: under the host API's 300 states/minute), and resumes from the `history` month in the
