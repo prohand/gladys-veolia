@@ -14,13 +14,14 @@ import { ACCOUNT, createFakePortal } from './fakeVeolia.js';
 export function setup({
   daily = [],
   monthly = [],
+  billed = [],
   readingMode,
   today = '2026-10-10',
   config = {},
   sleep = async () => {},
 } = {}) {
   const gladys = createFakeGladys();
-  const portal = createFakePortal({ daily, monthly, readingMode });
+  const portal = createFakePortal({ daily, monthly, billed, readingMode });
   const clock = { now: Date.parse(`${today}T10:00:00Z`) };
   const storeFile = join(mkdtempSync(join(tmpdir(), 'veolia-')), 'state.json');
   const store = new Store(storeFile);

@@ -90,12 +90,114 @@ function refreshButton() {
   };
 }
 
+function portalStatus(sync) {
+  return {
+    label: {
+      en: 'Veolia portal',
+      fr: 'Portail Veolia',
+      de: 'Veolia-Portal',
+      es: 'Portal de Veolia',
+    },
+    icon: 'cloud',
+    value: sync.status.connected
+      ? { en: 'Connected', fr: 'Connecté', de: 'Verbunden', es: 'Conectado' }
+      : { en: 'Error', fr: 'Erreur', de: 'Fehler', es: 'Error' },
+    color: sync.status.connected ? WIDGET_COLORS.SUCCESS : WIDGET_COLORS.DANGER,
+  };
+}
+
+// Bills drawn by the card of a meter that is not remote-read (two to four a year).
+const BILLS_SHOWN = 8;
+
+/** The card of a meter that is not remote-read: its bills, no daily reading. */
+function billedContent(sync, meter) {
+  const { summary, billed, subscription } = meter;
+  const bill = summary.lastBill;
+  const components = [
+    {
+      type: 'text',
+      variant: 'caption',
+      text: {
+        en: `Meter ${subscription.meter}, not remote-read: bills`,
+        fr: `Compteur ${subscription.meter}, non télérelevé : factures`,
+        de: `Zähler ${subscription.meter}, nicht fernausgelesen: Rechnungen`,
+        es: `Contador ${subscription.meter}, sin telelectura: facturas`,
+      },
+    },
+    {
+      type: 'value',
+      label: {
+        en: 'Last bill',
+        fr: 'Dernière facture',
+        de: 'Letzte Rechnung',
+        es: 'Última factura',
+      },
+      icon: 'file-text',
+      value: m3(bill.m3),
+      unit: 'm³',
+      color: WIDGET_COLORS.PRIMARY,
+    },
+    {
+      type: 'value',
+      label: { en: 'Index', fr: 'Index', de: 'Zählerstand', es: 'Índice' },
+      icon: 'hash',
+      value: m3(summary.indexM3),
+      unit: 'm³',
+    },
+  ];
+  const points = billed.slice(-BILLS_SHOWN).map((b) => ({ t: b.date, v: b.m3 }));
+  if (points.length > 1) {
+    components.push({
+      type: 'chart',
+      chart_type: 'bar',
+      title: {
+        en: 'Billed volumes',
+        fr: 'Volumes facturés',
+        de: 'Abgerechnete Mengen',
+        es: 'Volúmenes facturados',
+      },
+      unit: 'm³',
+      series: [
+        {
+          name: { en: 'Billed', fr: 'Facturé', de: 'Abgerechnet', es: 'Facturado' },
+          points,
+        },
+      ],
+    });
+  }
+  const period = bill.from ? `${bill.from} → ${bill.date}` : bill.date;
+  components.push(
+    {
+      type: 'status',
+      items: [
+        {
+          label: {
+            en: 'Billed period',
+            fr: 'Période facturée',
+            de: 'Abrechnungszeitraum',
+            es: 'Periodo facturado',
+          },
+          icon: 'calendar',
+          value: period,
+          color: WIDGET_COLORS.NEUTRAL,
+        },
+        portalStatus(sync),
+      ],
+    },
+    refreshButton(),
+  );
+  return { ttl_seconds: 3600, components };
+}
+
 export function buildWidgetContent(sync, settings = {}) {
   const meter = sync.meterOf(settings.device);
   if (!meter) {
     return emptyContent(sync);
   }
   const { summary, daily, subscription } = meter;
+  if (!summary.lastReading && summary.lastBill) {
+    return billedContent(sync, meter);
+  }
   const days = CHART_DAYS.includes(Number(settings.days))
     ? Number(settings.days)
     : DEFAULT_CHART_DAYS;
@@ -118,19 +220,7 @@ export function buildWidgetContent(sync, settings = {}) {
       ...RELIABILITY[reliabilityOf(last.reliability)],
     });
   }
-  status.push({
-    label: {
-      en: 'Veolia portal',
-      fr: 'Portail Veolia',
-      de: 'Veolia-Portal',
-      es: 'Portal de Veolia',
-    },
-    icon: 'cloud',
-    value: sync.status.connected
-      ? { en: 'Connected', fr: 'Connecté', de: 'Verbunden', es: 'Conectado' }
-      : { en: 'Error', fr: 'Erreur', de: 'Fehler', es: 'Error' },
-    color: sync.status.connected ? WIDGET_COLORS.SUCCESS : WIDGET_COLORS.DANGER,
-  });
+  status.push(portalStatus(sync));
 
   const components = [
     {
@@ -284,12 +374,20 @@ export function buildComparisonContent(sync, settings = {}) {
   } else {
     components.push({
       type: 'text',
-      text: {
-        en: 'Veolia has no monthly total for this meter yet.',
-        fr: 'Veolia n’a pas encore de total mensuel pour ce compteur.',
-        de: 'Veolia hat für diesen Zähler noch keine Monatssumme.',
-        es: 'Veolia todavía no tiene un total mensual para este contador.',
-      },
+      // A meter that is not remote-read never gets one: say where its data is.
+      text: meter.summary.lastBill
+        ? {
+            en: 'This meter is not remote-read: Veolia only has its bills, see the water consumption card.',
+            fr: 'Ce compteur n’est pas télérelevé : Veolia n’a que ses factures, voir la carte Consommation d’eau.',
+            de: 'Dieser Zähler wird nicht fernausgelesen: Veolia hat nur seine Rechnungen, siehe die Karte Wasserverbrauch.',
+            es: 'Este contador no tiene telelectura: Veolia solo tiene sus facturas, vea la tarjeta Consumo de agua.',
+          }
+        : {
+            en: 'Veolia has no monthly total for this meter yet.',
+            fr: 'Veolia n’a pas encore de total mensuel pour ce compteur.',
+            de: 'Veolia hat für diesen Zähler noch keine Monatssumme.',
+            es: 'Veolia todavía no tiene un total mensual para este contador.',
+          },
     });
   }
   components.push(refreshButton());

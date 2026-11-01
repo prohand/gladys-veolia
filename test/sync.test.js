@@ -6,7 +6,7 @@ import { HISTORY_MONTHS, TRIGGERS } from '../src/sync.js';
 import { FEATURE } from '../src/meter.js';
 import { MESSAGES } from '../src/status.js';
 import { normalizeConfig } from '../src/config.js';
-import { ACCOUNT, dailyRange, dailyRecord } from './helpers/fakeVeolia.js';
+import { ACCOUNT, billedRecord, dailyRange, dailyRecord } from './helpers/fakeVeolia.js';
 import { setToday, setup } from './helpers/setup.js';
 import { assertAllLanguages } from './helpers/languages.js';
 
@@ -61,6 +61,83 @@ test('a meter that is not remote-read publishes no fake zero', async () => {
   await sync.refresh();
   assert.deepEqual(gladys.published, [], 'no reading, no 0 m³ total');
   assert.equal(sync.meterOf().subscription.readingMode, 'RADIORELEVE');
+});
+
+// A delegated portal (C Mon O) that leaves mode_releve out, and two bills.
+const bills = () => [
+  billedRecord('2025-09-10', '2026-03-12', 38, 1191.5),
+  billedRecord('2026-03-12', '2026-09-14', 42.5, 1234),
+];
+const billedFeature = `${DEVICE_ID}:${FEATURE.BILLED}`;
+const indexFeature = `${DEVICE_ID}:${FEATURE.INDEX}`;
+
+test('a meter that is not remote-read publishes its bills on their dates', async () => {
+  const { gladys, sync, store } = setup({ readingMode: null, billed: bills() });
+  assert.deepEqual(await sync.refresh(), { ok: true });
+  const features = gladys.discovered[0][0].features.map((f) => f.external_id);
+  assert.ok(features.includes(billedFeature), 'the device has the billed volume');
+  gladys.createAllDevices();
+  await sync.onDeviceCreated(DEVICE_ID);
+
+  const billed = gladys.published.filter((s) => s.device_feature_external_id === billedFeature);
+  assert.deepEqual(
+    billed.map((s) => [s.state, s.created_at]),
+    [
+      [38, '2026-03-12T12:00:00.000Z'],
+      [42.5, '2026-09-14T12:00:00.000Z'],
+    ],
+  );
+  const index = gladys.published.filter((s) => s.device_feature_external_id === indexFeature);
+  assert.deepEqual(
+    index.map((s) => s.state),
+    [1191.5, 1234],
+  );
+  assert.ok(
+    gladys.published.every((s) => s.created_at),
+    'no current total from a bill',
+  );
+  assert.equal(store.get(ACCOUNT.pds, 'billed'), '2026-09-14');
+  assert.equal(sync.meterOf().summary.indexM3, 1234);
+});
+
+test('only a new bill is published, and the history import skips the meter', async () => {
+  const { gladys, sync, portal } = setup({ readingMode: null, billed: bills() });
+  await sync.refresh();
+  gladys.createAllDevices();
+  await sync.onDeviceCreated(DEVICE_ID);
+  await sync.importHistory();
+  const imports = portal.calls.filter((c) => /journalieres/.test(c.url.pathname));
+  assert.equal(imports.length, 2, 'only the refresh months, no history import');
+
+  gladys.stateCalls.length = 0;
+  await sync.refresh();
+  assert.deepEqual(gladys.published, [], 'nothing new, nothing re-published');
+  portal.billed.push(billedRecord('2026-09-14', '2026-10-09', 7.25, 1241.25));
+  await sync.refresh();
+  assert.deepEqual(
+    gladys.published.map((s) => [s.device_feature_external_id, s.state]),
+    [
+      [billedFeature, 7.25],
+      [indexFeature, 1241.25],
+    ],
+  );
+});
+
+test('a radio-read meter reads only its bills', async () => {
+  const { sync, portal } = setup({ readingMode: 'RADIORELEVE', billed: bills() });
+  await sync.refresh();
+  const paths = portal.calls.map((c) => c.url.pathname);
+  assert.ok(!paths.some((p) => /journalieres|mensuelles/.test(p)), 'no daily or monthly call');
+  assert.ok(paths.includes(`/consommations/facturation/${ACCOUNT.subscriptionId}`));
+  assert.equal(sync.meterOf().summary.lastBill.m3, 42.5);
+});
+
+test('a remote-read meter never asks for its bills', async () => {
+  const { sync, portal, gladys } = setup({ daily: history() });
+  await sync.refresh();
+  assert.ok(!portal.calls.some((c) => /facturation\//.test(c.url.pathname)));
+  const features = gladys.discovered[0][0].features.map((f) => f.external_id);
+  assert.ok(!features.includes(billedFeature));
 });
 
 test('later refreshes only publish the new readings', async () => {

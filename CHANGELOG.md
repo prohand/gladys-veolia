@@ -6,6 +6,20 @@ All notable changes to this integration are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Meters that are not remote-read (reading mode `RADIORELEVE`, `MANUAL` or not
+  given, as on C Mon O): the integration reads their bills, like the Veolia
+  website. The device gets a **Consommation facturée** value (m³, on each bill
+  date), the index follows the bills, the widget shows the last bill and a
+  chart of the last ones, and "Test the connection" gives the last bill. A
+  device already added shows an **Update** button in Discovery.
+
+### Changed
+
+- A remote-read meter no longer asks for its bills, a radio-read or manually
+  read meter no longer asks for daily and monthly readings it never has.
+
 ## [1.3.2] - 2026-10-31
 
 ### Changed

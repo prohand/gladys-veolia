@@ -7,7 +7,8 @@ Dashboard-Widget und Karten für deine Szenen.
 ## Was du brauchst
 
 - Einen **fernablesbaren** Wasserzähler (télérelève): Er sendet deinen Verbrauch
-  jeden Tag an Veolia. Ohne ihn hat Veolia nur einen Messwert pro Jahr.
+  jeden Tag an Veolia. Ohne ihn hat Veolia nur deine Rechnungen: Die
+  Integration zeigt dann die abgerechneten Mengen (siehe unten).
 - Ein **Veolia-Kundenkonto** mit E-Mail-Adresse und Passwort. Prüfe, dass
   die Veolia-Website deinen Verbrauch Tag für Tag anzeigt.
 - Gladys **5.3 oder neuer**.
@@ -55,6 +56,24 @@ sie zu behalten.
 | Consommation journalière | L       | Täglich verbrauchte Liter, am Tag des Messwerts |
 | Consommation du mois     | m³      | Summe des aktuellen Monats                      |
 | Consommation de l'année  | m³      | Summe des aktuellen Kalenderjahres              |
+
+### Nicht fernausgelesener Zähler
+
+Liest Veolia deinen Zähler nicht aus der Ferne ab (Ableseart `RADIORELEVE`,
+`MANUAL` oder nicht angegeben, wie bei C Mon O), gibt es keinen täglichen
+Messwert. Die Veolia-Website zeigt dann nur die Liste deiner Rechnungen, und
+die Integration ebenso:
+
+- Das Gerät hat einen Wert mehr, **Consommation facturée** (m³): die Menge
+  jeder Rechnung, am Rechnungsdatum gespeichert;
+- der **Index** übernimmt den Zählerstand jeder Rechnung, an ihrem Datum;
+- Tages-, Monats- und Jahresverbrauch bleiben leer;
+- das Widget zeigt die letzte Rechnung, den Zählerstand und ein Diagramm der
+  letzten Rechnungen.
+
+Diese Werte ändern sich nur wenige Male im Jahr. War das Gerät schon
+hinzugefügt, öffne **Entdecken** und klicke auf **Aktualisieren**, um den
+neuen Wert hinzuzufügen.
 
 Die Gerätekarte trägt das Abzeichen **Cloud**, solange das Veolia-Portal
 antwortet, **Nicht erreichbar**, wenn es nicht antwortet, mit einem orangefarbenen
@@ -118,7 +137,8 @@ und mir senden: _Letzter Monat: {{…cubic_meters}} m³_“.
   nicht fernablesbar. **Verbindung testen** zeigt die Ableseart, die Veolia
   angibt (`RADIORELEVE`, `MANUAL`…), die Logs ebenfalls bei jeder
   Aktualisierung. Auf der Veolia-Website: „Type de relève“ deines Abonnements.
-  Nur fernausgelesene Zähler haben tägliche Messwerte. Ist der Zähler
+  Nur fernausgelesene Zähler haben tägliche Messwerte, die anderen zeigen
+  ihre Rechnungen (siehe _Nicht fernausgelesener Zähler_). Ist der Zähler
   fernausgelesen oder die Ableseart „nicht angegeben“, zählt die Meldung auch
   die von Veolia gesendeten Datensätze: Kopiere sie in ein GitHub-Issue.
 - **Gemeinde „noch nicht unterstützt“**: Deine Gemeinde hat ein eigenes

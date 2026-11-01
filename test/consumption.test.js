@@ -6,6 +6,7 @@ import {
   daysBetween,
   localDate,
   monthOf,
+  normalizeBilled,
   normalizeDaily,
   normalizeMonthly,
   reliabilityOf,
@@ -168,4 +169,40 @@ test('yearlyComparison: a year without data is left out, January has no same per
     years.map((y) => [y.year, y.samePeriod]),
     [[2026, null]],
   );
+});
+
+test('normalizeBilled sorts the bills and reads every number format', () => {
+  const bills = normalizeBilled([
+    {
+      date_facturation: '2026-09-14T00:00:00+02:00',
+      date_facturation_precedente: '2026-03-12',
+      volume_facture_eau: { m3: '42.5' },
+      index_facture: '1234',
+    },
+    {
+      date_facturation: '2026-03-12',
+      volume_facture_eau: { litre: 38000 },
+      index_facture: { m3: 1191.5 },
+    },
+    { date_facturation: 'not a date', volume_facture_eau: { m3: 1 } },
+    { date_facturation: '2025-09-10', volume_facture_eau: {} },
+    null,
+  ]);
+  assert.deepEqual(bills, [
+    { date: '2026-03-12', from: null, m3: 38, indexM3: 1191.5 },
+    { date: '2026-09-14', from: '2026-03-12', m3: 42.5, indexM3: 1234 },
+  ]);
+});
+
+test('summarize gives the last bill, and its index when there is no daily reading', () => {
+  const billed = [
+    { date: '2026-03-12', from: null, m3: 38, indexM3: 1191.5 },
+    { date: '2026-09-14', from: '2026-03-12', m3: 42.5, indexM3: null },
+  ];
+  const summary = summarize({ daily: [], monthly: [], billed, today: '2026-10-10' });
+  assert.deepEqual(summary.lastBill, billed[1]);
+  assert.equal(summary.indexM3, 1191.5, 'the last known index');
+  assert.equal(summary.lastReading, null);
+  assert.equal(summary.currentYearM3, null, 'a bill is not a yearly total');
+  assert.equal(summarize({ daily: [], monthly: [], today: '2026-10-10' }).lastBill, null);
 });

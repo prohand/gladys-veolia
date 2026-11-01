@@ -7,7 +7,7 @@ import {
   lookupTowns,
 } from '../src/veolia/client.js';
 import { PORTALS } from '../src/veolia/portals.js';
-import { ACCOUNT, createFakePortal, dailyRecord } from './helpers/fakeVeolia.js';
+import { ACCOUNT, billedRecord, createFakePortal, dailyRecord } from './helpers/fakeVeolia.js';
 
 const noSleep = async () => {};
 
@@ -170,4 +170,20 @@ test('an unknown e-mail is a VeoliaAuthError', async () => {
     );
   const client = new VeoliaClient({ email: 'a@b.fr', password: 'x', fetch, sleep: noSleep });
   await assert.rejects(client.login(), VeoliaAuthError);
+});
+
+test('the bills are read on the path the web portal uses', async () => {
+  const portal = createFakePortal({
+    readingMode: null,
+    billed: [billedRecord('2026-03-12', '2026-09-14', 42.5, 1234)],
+  });
+  const client = clientFor(portal);
+  const [subscription] = await client.getSubscriptions();
+  assert.equal(subscription.readingMode, null, 'mode_releve left out by the portal');
+  const records = await client.getBilledVolumes(subscription);
+  assert.equal(records.length, 1);
+  assert.equal(
+    portal.calls.at(-1).url.pathname,
+    `/consommations/facturation/${ACCOUNT.subscriptionId}`,
+  );
 });

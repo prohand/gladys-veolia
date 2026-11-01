@@ -4,6 +4,8 @@
 // Per meter (keyed by PDS):
 //   - published: date of the last daily reading published to Gladys, so a
 //     restart does not write the same readings twice in the history;
+//   - billed: date of the last bill published (meters that are not
+//     remote-read), same purpose;
 //   - event: date of the last reading the scene triggers have seen, so a
 //     restart does not fire `new_reading` again;
 //   - overdue: date of the last reading an `reading_overdue` event was fired

@@ -9,6 +9,10 @@
 // The daily readings are published as PAST states (`created_at` = the reading
 // date): Veolia sends them one to three days late, and the history must show
 // each litre on the day it was used.
+//
+// A meter that is not remote-read has no daily reading: Veolia only has its
+// bills (volume and index, a few times a year). Its device gets one more
+// feature, the billed volume, published on each bill date like the index.
 // -----------------------------------------------------------------------------
 
 import {
@@ -24,7 +28,16 @@ export const FEATURE = {
   DAILY: 'daily-consumption',
   MONTH: 'month-consumption',
   YEAR: 'year-consumption',
+  BILLED: 'billed-consumption',
 };
+
+/**
+ * Daily readings only exist for remote-read meters: the Veolia portal itself
+ * shows the bills instead whenever `mode_releve` is not TELERELEVE.
+ */
+export function isRemoteRead(subscription) {
+  return subscription.readingMode === 'TELERELEVE';
+}
 
 const VOLUME = DEVICE_FEATURE_CATEGORIES.VOLUME_SENSOR;
 const { DECIMAL, INTEGER } = DEVICE_FEATURE_TYPES.VOLUME_SENSOR;
@@ -57,6 +70,14 @@ const FEATURES = [
   },
 ];
 
+const BILLED_FEATURE = {
+  key: FEATURE.BILLED,
+  name: 'Consommation facturée',
+  type: DECIMAL,
+  unit: CUBIC_METER,
+  max: 100000,
+};
+
 export function meterIds(gladys, pds) {
   return gladys.externalIds(DEVICE_TYPE, pds);
 }
@@ -69,18 +90,20 @@ export function buildDevice(gladys, subscription) {
     external_id: ids.device,
     // No poll_frequency: the integration refreshes on its own schedule (the
     // core's polling tops out at one minute, Veolia updates once a day).
-    features: FEATURES.map((feature) => ({
-      name: feature.name,
-      external_id: ids.feature(feature.key),
-      category: VOLUME,
-      type: feature.type,
-      unit: feature.unit,
-      min: 0,
-      max: feature.max,
-      read_only: true,
-      has_feedback: false,
-      keep_history: true,
-    })),
+    features: [...FEATURES, ...(isRemoteRead(subscription) ? [] : [BILLED_FEATURE])].map(
+      (feature) => ({
+        name: feature.name,
+        external_id: ids.feature(feature.key),
+        category: VOLUME,
+        type: feature.type,
+        unit: feature.unit,
+        min: 0,
+        max: feature.max,
+        read_only: true,
+        has_feedback: false,
+        keep_history: true,
+      }),
+    ),
     params: [
       { name: 'Numéro de compteur', value: subscription.meter },
       { name: 'Point de service (PDS)', value: subscription.pds },
@@ -111,6 +134,32 @@ export function buildReadingStates(gladys, pds, readings) {
         device_feature_external_id: ids.feature(FEATURE.INDEX),
         state: reading.indexM3,
         created_at: pastInstant(reading.date),
+      });
+    }
+  }
+  return states;
+}
+
+/**
+ * The past states of bills (billed volume and index, on the bill date).
+ * @param {object} gladys
+ * @param {string} pds
+ * @param {Array} bills normalized billed volumes
+ */
+export function buildBilledStates(gladys, pds, bills) {
+  const ids = meterIds(gladys, pds);
+  const states = [];
+  for (const bill of bills) {
+    states.push({
+      device_feature_external_id: ids.feature(FEATURE.BILLED),
+      state: bill.m3,
+      created_at: pastInstant(bill.date),
+    });
+    if (bill.indexM3 !== null) {
+      states.push({
+        device_feature_external_id: ids.feature(FEATURE.INDEX),
+        state: bill.indexM3,
+        created_at: pastInstant(bill.date),
       });
     }
   }

@@ -6,6 +6,9 @@
 //     consommation: { litre: 123, m3: 0.123 }, fiabilite_index: 'MESURE' }
 // Monthly record (mensuelles):
 //   { annee: 2026, mois: 10, consommation: { m3: 3.4 }, fiabilite_conso: 'MESURE' }
+// Billed record (facturation), the only data of a meter that is not remote-read:
+//   { date_facturation_precedente: '2026-03-12', date_facturation: '2026-09-14',
+//     volume_facture_eau: { m3: 42 }, index_facture: 1234 }
 //
 // Numbers may arrive as strings: everything goes through toNumber(). A reading
 // is made by the remote meter once a day and reaches the portal one to three
@@ -99,6 +102,46 @@ export function normalizeMonthly(records = []) {
   return [...byMonth.entries()].sort(([a], [b]) => a - b).map(([, value]) => value);
 }
 
+/** 'YYYY-MM-DD' of a date the backend sends as a day or as an ISO instant. */
+function dayOf(value) {
+  const text = String(value ?? '');
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+    return text;
+  }
+  const instant = Date.parse(text);
+  return Number.isNaN(instant) ? null : localDate(instant);
+}
+
+/**
+ * Billed volumes, sorted by bill date, one per date (the last record wins).
+ * `from` is the previous bill date: the bill covers `from` to `date`.
+ * @returns {Array<{ date: string, from: string | null, m3: number, indexM3: number | null }>}
+ */
+export function normalizeBilled(records = []) {
+  const byDate = new Map();
+  for (const record of records) {
+    const date = dayOf(record?.date_facturation);
+    if (!date) {
+      continue;
+    }
+    const volume = record.volume_facture_eau;
+    const liters = toNumber(volume?.litre);
+    const m3 = toNumber(volume?.m3) ?? (liters === null ? null : liters / 1000);
+    if (m3 === null) {
+      continue;
+    }
+    // The web portal reads the index as a plain number.
+    const index = record.index_facture;
+    byDate.set(date, {
+      date,
+      from: dayOf(record.date_facturation_precedente),
+      m3: round3(Math.max(0, m3)),
+      indexM3: toNumber(typeof index === 'object' && index !== null ? index.m3 : index),
+    });
+  }
+  return [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date));
+}
+
 // Total of one month: the monthly record when Veolia has one, the sum of the
 // daily readings otherwise (the current month is often missing early on).
 function monthM3(daily, monthly, { year, month }) {
@@ -113,9 +156,9 @@ function monthM3(daily, monthly, { year, month }) {
 
 /**
  * Everything the device, the widget and the scenes show, from the records.
- * @param {{ daily: Array, monthly: Array, today: string }} input normalized records
+ * @param {{ daily: Array, monthly: Array, billed?: Array, today: string }} input normalized records
  */
-export function summarize({ daily, monthly, today }) {
+export function summarize({ daily, monthly, billed = [], today }) {
   const last = daily.at(-1) ?? null;
   const current = monthOf(today);
   const previous = monthOf(today, -1);
@@ -127,7 +170,12 @@ export function summarize({ daily, monthly, today }) {
     ? 0
     : (monthM3(daily, [], current) ?? 0);
   const yearTotal = yearMonths.reduce((sum, m) => sum + m.m3, 0) + missingThisMonth;
-  const lastIndex = [...daily].reverse().find((d) => d.indexM3 !== null)?.indexM3 ?? null;
+  const lastBill = billed.at(-1) ?? null;
+  // A meter that is not remote-read only has the index of its bills.
+  const lastIndex =
+    [...daily].reverse().find((d) => d.indexM3 !== null)?.indexM3 ??
+    [...billed].reverse().find((b) => b.indexM3 !== null)?.indexM3 ??
+    null;
   // Veolia sent nothing at all (e.g. a meter that is not remote-read): the
   // totals are unknown, not zero. A 0 would look like a real reading.
   const known = daily.length > 0 || monthly.length > 0;
@@ -138,6 +186,7 @@ export function summarize({ daily, monthly, today }) {
     previousMonthM3: monthM3(daily, monthly, previous),
     currentYearM3: known ? round3(yearTotal) : null,
     daysSinceReading: last ? daysBetween(last.date, today) : null,
+    lastBill,
   };
 }
 

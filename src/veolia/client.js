@@ -9,7 +9,9 @@
 //   3. GET /abonnements/{id}/facturation -> the delivery point (PDS) and the
 //      subscription start date, both required by the consumption endpoints;
 //   4. GET /consommations/{id}/journalieres (one month of daily readings) and
-//      /consommations/{id}/mensuelles (one year of monthly totals).
+//      /consommations/{id}/mensuelles (one year of monthly totals), or, for a
+//      meter that is not remote-read, /consommations/facturation/{id} (the
+//      volume and index of each bill), like the web portal does.
 //
 // `fetch` is injected so the tests never touch the network. The password is
 // only ever sent to Cognito and never logged.
@@ -205,6 +207,14 @@ export class VeoliaClient {
         'numero-pds': subscription.pds,
         'date-debut-abonnement': subscription.startDate,
       },
+    );
+    return Array.isArray(records) ? records : [];
+  }
+
+  /** Volume and index of each bill (raw records): meters that are not remote-read. */
+  async getBilledVolumes(subscription) {
+    const records = await this.get(
+      `/consommations/facturation/${encodeURIComponent(subscription.id)}`,
     );
     return Array.isArray(records) ? records : [];
   }

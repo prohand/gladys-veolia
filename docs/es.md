@@ -7,7 +7,8 @@ widget para el panel y tarjetas para sus escenas.
 ## Qué necesita
 
 - Un contador de agua con **telelectura** (télérelève): envía su consumo a
-  Veolia todos los días. Sin él, Veolia solo tiene una lectura al año.
+  Veolia todos los días. Sin él, Veolia solo tiene sus facturas: la
+  integración muestra entonces los volúmenes facturados (ver más abajo).
 - Un **área de cliente de Veolia** con un e-mail y una contraseña. Compruebe que
   la web de Veolia muestra su consumo día a día.
 - Gladys **5.3 o posterior**.
@@ -54,6 +55,24 @@ al menos 2 años para conservarlos.
 | Consommation journalière | L      | Litros consumidos cada día, guardados en su día |
 | Consommation du mois     | m³     | Total del mes en curso                          |
 | Consommation de l'année  | m³     | Total del año natural en curso                  |
+
+### Contador sin telelectura
+
+Si Veolia no lee su contador a distancia (modo de lectura `RADIORELEVE`,
+`MANUAL` o no indicado, como en C Mon O), no hay lectura diaria. La web de
+Veolia solo muestra entonces la lista de sus facturas, y la integración
+también:
+
+- el dispositivo tiene un valor más, **Consommation facturée** (m³): el
+  volumen de cada factura, guardado en la fecha de la factura;
+- el **Index** toma el índice de cada factura, en su fecha;
+- los consumos del día, del mes y del año quedan vacíos;
+- el widget muestra la última factura, el índice y un gráfico de las últimas
+  facturas.
+
+Estos valores solo cambian unas pocas veces al año. Si el dispositivo ya
+estaba añadido, abra **Descubrimiento** y haga clic en **Actualizar** para
+añadir el nuevo valor.
 
 La tarjeta del dispositivo lleva la insignia **Nube** mientras el portal de
 Veolia responde, **Inaccesible** cuando no responde, con un punto naranja cuando
@@ -114,7 +133,8 @@ enviarme: _El mes pasado: {{…cubic_meters}} m³_».
   tiene telelectura. **Probar la conexión** muestra el modo de lectura que da
   Veolia (`RADIORELEVE`, `MANUAL`…), y los logs también en cada actualización.
   En la web de Veolia: «Type de relève» de su contrato. Solo los contadores con
-  telelectura tienen lecturas diarias. Si el contador tiene telelectura o el
+  telelectura tienen lecturas diarias, los demás muestran sus facturas (ver
+  _Contador sin telelectura_). Si el contador tiene telelectura o el
   modo es «no indicado», el mensaje también cuenta los registros enviados por
   Veolia: cópielo en una issue de GitHub.
 - **Municipio «todavía no compatible»**: su municipio tiene su propio portal de

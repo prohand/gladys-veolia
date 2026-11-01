@@ -7,7 +7,8 @@ d'eau », un widget de tableau de bord, et des cartes pour vos scènes.
 ## Ce qu'il vous faut
 
 - Un compteur d'eau **télérelevé** : c'est lui qui envoie chaque jour votre
-  consommation à Veolia. Sans télérelève, Veolia n'a qu'un relevé par an.
+  consommation à Veolia. Sans télérelève, Veolia n'a que vos factures :
+  l'intégration affiche alors les volumes facturés (voir plus bas).
 - Un **espace client Veolia** avec e-mail et mot de passe. Vérifiez que vous
   voyez bien votre consommation par jour sur le site Veolia.
 - Gladys **5.3 ou plus récent**.
@@ -53,6 +54,24 @@ durée d'au moins 2 ans pour les garder.
 | Consommation journalière | L     | Litres consommés chaque jour, rangés à la date du relevé |
 | Consommation du mois     | m³    | Total du mois en cours                                   |
 | Consommation de l'année  | m³    | Total de l'année civile en cours                         |
+
+### Compteur non télérelevé
+
+Si Veolia ne relève pas votre compteur à distance (type de relève
+`RADIORELEVE`, `MANUAL` ou non indiqué, comme sur C Mon O), il n'y a pas de
+relevé par jour. Le site Veolia n'affiche alors que la liste de vos factures,
+et l'intégration fait pareil :
+
+- l'appareil a une valeur de plus, **Consommation facturée** (m³) : le volume
+  de chaque facture, rangé à la date de la facture ;
+- l'**Index** prend l'index de chaque facture, à sa date ;
+- les consommations du jour, du mois et de l'année restent vides ;
+- le widget montre la dernière facture, l'index et un graphique des
+  dernières factures.
+
+Ces valeurs ne changent que quelques fois par an. Si l'appareil était déjà
+ajouté, ouvrez **Découverte** et cliquez sur **Mettre à jour** pour ajouter la
+nouvelle valeur.
 
 La carte de l'appareil porte le badge **Cloud** quand le portail
 Veolia répond, **Injoignable** quand il ne répond pas, avec un point orange
@@ -114,7 +133,8 @@ et m'envoyer : _Le mois dernier : {{…cubic_meters}} m³_ ».
   sans doute pas télérelevé. **Tester la connexion** affiche le type de relève
   donné par Veolia (`RADIORELEVE`, `MANUAL`…), les logs aussi à chaque
   rafraîchissement. Sur le site Veolia : « Type de relève » de votre abonnement.
-  Seuls les compteurs télérelevés ont des relevés journaliers. Si le compteur
+  Seuls les compteurs télérelevés ont des relevés journaliers : les autres
+  affichent leurs factures (voir _Compteur non télérelevé_). Si le compteur
   est télérelevé ou si le type est « non indiqué », le message donne aussi le
   nombre de relevés envoyés par Veolia : copiez-le dans une demande GitHub.
 - **Commune « pas encore prise en charge »** : votre commune a son propre

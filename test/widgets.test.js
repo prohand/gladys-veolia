@@ -9,7 +9,7 @@ import {
   refreshWidgets,
 } from '../src/widgets.js';
 import { normalizeConfig } from '../src/config.js';
-import { dailyRange, dailyRecord } from './helpers/fakeVeolia.js';
+import { billedRecord, dailyRange, dailyRecord } from './helpers/fakeVeolia.js';
 import { setup } from './helpers/setup.js';
 import { createFakeGladys } from './helpers/fakeGladys.js';
 import { assertAllLanguages } from './helpers/languages.js';
@@ -41,6 +41,34 @@ test('an estimated, overdue reading is still a valid content', async () => {
   assertAllLanguages(content);
   const status = content.components.find((c) => c.type === 'status');
   assert.ok(status.items.some((item) => item.color === 'warning'));
+});
+
+test('a meter that is not remote-read shows its bills', async () => {
+  const { sync } = setup({
+    readingMode: null,
+    billed: [
+      billedRecord('2025-09-10', '2026-03-12', 38, 1191.5),
+      billedRecord('2026-03-12', '2026-09-14', 42.5, 1234),
+    ],
+  });
+  await sync.refresh();
+  const content = await getContent(sync);
+  assert.deepEqual(validateWidgetContent(content), []);
+  assertAllLanguages(content);
+  const values = content.components.filter((c) => c.type === 'value');
+  assert.deepEqual(
+    values.map((v) => v.value),
+    [42.5, 1234],
+  );
+  const chart = content.components.find((c) => c.type === 'chart');
+  assert.deepEqual(chart.series[0].points, [
+    { t: '2026-03-12', v: 38 },
+    { t: '2026-09-14', v: 42.5 },
+  ]);
+  const comparison = await WIDGETS[COMPARISON_WIDGET].get(sync, { settings: {} });
+  assert.deepEqual(validateWidgetContent(comparison), []);
+  assertAllLanguages(comparison);
+  assert.match(comparison.components.at(-2).text.fr, /pas télérelevé/);
 });
 
 test('before any data, the widget explains why', async () => {
