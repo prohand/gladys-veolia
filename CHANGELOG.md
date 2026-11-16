@@ -6,6 +6,10 @@ All notable changes to this integration are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-11-16
+
+- Maintenance release, no functional change.
+
 ## [1.4.0] - 2026-11-01
 
 ### Added
@@ -123,7 +127,8 @@ All notable changes to this integration are documented here. The format follows
   image and runs the store admission checks; Dependabot keeps the npm
   dependencies, the GitHub Actions and the Docker base image up to date.
 
-[Unreleased]: https://github.com/prohand/gladys-veolia/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/prohand/gladys-veolia/compare/v1.4.1...HEAD
+[1.4.1]: https://github.com/prohand/gladys-veolia/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/prohand/gladys-veolia/compare/v1.3.2...v1.4.0
 [1.3.2]: https://github.com/prohand/gladys-veolia/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/prohand/gladys-veolia/compare/v1.3.0...v1.3.1
