@@ -6,6 +6,10 @@ All notable changes to this integration are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.4.3] - 2026-11-16
+
+- Maintenance release, no functional change.
+
 ## [1.4.2] - 2026-11-16
 
 - Update `@gladysassistant/integration-sdk` to 0.16.1 (security update).
@@ -131,7 +135,8 @@ All notable changes to this integration are documented here. The format follows
   image and runs the store admission checks; Dependabot keeps the npm
   dependencies, the GitHub Actions and the Docker base image up to date.
 
-[Unreleased]: https://github.com/prohand/gladys-veolia/compare/v1.4.2...HEAD
+[Unreleased]: https://github.com/prohand/gladys-veolia/compare/v1.4.3...HEAD
+[1.4.3]: https://github.com/prohand/gladys-veolia/compare/v1.4.2...v1.4.3
 [1.4.2]: https://github.com/prohand/gladys-veolia/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/prohand/gladys-veolia/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/prohand/gladys-veolia/compare/v1.3.2...v1.4.0
